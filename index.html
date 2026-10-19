@@ -1,1 +1,83 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GlitchNet ★</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Verdana, sans-serif;
+      text-align: center;
+    }
+    header {
+      background: hotpink;
+      color: black;
+      padding: 20px;
+      border: 5px solid #adff2f;
+    }
+    h1 { font-size: 42px; }
+    nav { margin: 25px 0; }
+    button {
+      background: #adff2f;
+      border: 3px solid hotpink;
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: hotpink; }
+    .box {
+      border: 3px dashed hotpink;
+      padding: 25px;
+      margin: 20px auto;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>★ GLITCHNET ★</h1>
+    <p>YOUR WORLD. YOUR AVATAR. YOUR DRAMA.</p>
+  </header>
+
+  <nav>
+    <button onclick="show('home')">HOME</button>
+    <button onclick="show('quiz')">QUIZZES</button>
+    <button onclick="show('avatar')">AVATARS</button>
+  </nav>
+
+  <div id="home" class="box">
+    <h2>WELCOME TO GLITCHNET!</h2>
+    <p>Your totally awesome corner of the internet.</p>
+  </div>
+
+  <div id="quiz" class="box" hidden>
+    <h2>WHAT'S YOUR ALTER EGO?</h2>
+    <p>Choose your ideal Friday night!</p>
+    <button onclick="answer('Alien Scientist')">Secret laboratory</button>
+    <button onclick="answer('Scene Royalty')">Concert</button>
+    <p id="result"></p>
+  </div>
+
+  <div id="avatar" class="box" hidden>
+    <h2>AVATAR STUDIO</h2>
+    <p>Coming soon! ★</p>
+  </div>
+
+  <script>
+    function show(page) {
+      ['home', 'quiz', 'avatar'].forEach(id => {
+        document.getElementById(id).hidden = id !== page;
+      });
+    }
+    function answer(result) {
+      document.getElementById('result').textContent =
+        'Your alter ego is: ' + result + '!';
+    }
+  </script>
+</body>
+</html>
+
