@@ -161,8 +161,9 @@
   .left-side nav .selected{background:#adff2f}
   .sticker{display:inline-block;background:#adff2f;color:#111;border:2px solid #ff75c5;font:bold 12px 'Courier New',monospace;padding:7px;transform:rotate(-4deg)}
   .micro-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .micro-buttons span{padding:5px 4px;border:2px solid #eee;background:#f273c0;color:#130c17;font:bold 9px Verdana,sans-serif;text-align:center}
-  .micro-buttons span:nth-child(2n){background:#b7ff36}
+  .micro-buttons span,.micro-buttons a{padding:5px 4px;border:2px solid #eee;background:#f273c0;color:#130c17;font:bold 9px Verdana,sans-serif;text-align:center}
+  .micro-buttons :nth-child(2n){background:#b7ff36}
+  .micro-buttons a{text-decoration:none;display:block;cursor:pointer}.micro-buttons a:hover,.micro-buttons a:focus-visible{background:#adff2f;color:#101010;transform:translateY(-2px);outline:2px dashed #fff;outline-offset:1px}
   .site-screen{display:grid;gap:17px}
   .site-screen[hidden]{display:none}
   .welcome-banner{background:linear-gradient(135deg,#371a40,#151522 75%);padding:20px;min-height:155px;position:relative}
@@ -244,7 +245,7 @@
           <div class="window-bar"><span>✿ web buttons</span><span>×</span></div>
           <div class="window-body">
             <div class="micro-buttons">
-              <span>I ♡ CATS</span><span>STAY WEIRD</span><span>MADE OF STARS</span><span>NO AI BOTS*</span><span>CLICK EVERYWHERE</span><span>GLITCH ACADEMY</span>
+              <a href="cats.html" aria-label="Open the 2000s cat photo archive">I ♡ CATS</a><span>STAY WEIRD</span><span>MADE OF STARS</span><span>NO AI BOTS*</span><span>CLICK EVERYWHERE</span><span>GLITCH ACADEMY</span>
             </div>
             <p class="muted">* Except the one writing our JavaScript.</p>
           </div>
