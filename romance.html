@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffd1e8">
+<meta name="description" content="Romance.exe: a playable shoujo visual novel inside GlitchNet.">
+<title>♡ ROMANCE.EXE | GlitchNet</title>
+<style>
+:root{--rose:#f958a4;--ink:#542445;--deep:#ab3077;--line:#a44c81;--paper:#fff7fd;--shade:#ffe3f2}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Georgia,serif;color:var(--ink);background:radial-gradient(ellipse at 10% 8%,#fff9ff 0,transparent 35%),radial-gradient(ellipse at 90% 80%,#ffedf7 0,transparent 35%),#ffd0e9}
+body:before{content:"";position:fixed;inset:0;background-image:radial-gradient(#fff 2px,transparent 2px);background-size:28px 28px;opacity:.55;pointer-events:none}
+body.night{--ink:#e8d5f2;--line:#9571a7;--paper:#30263e;--shade:#463451;--rose:#f28bc5;--deep:#d4a6e9;background:radial-gradient(circle at 80% 10%,#62416d,transparent 40%),#241b35}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #563bd4;outline-offset:4px}
+.wrap{width:min(1000px,calc(100% - 32px));margin:auto;position:relative;padding-bottom:36px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:24px 0;font:700 12px 'Courier New',monospace;letter-spacing:.07em}
+.back{border:2px solid var(--ink);background:var(--paper);padding:11px;text-decoration:none;box-shadow:4px 4px 0 var(--rose)}
+.mast{text-align:center;padding:14px 5px 22px;position:relative}
+.mast .overline{font:bold 12px 'Courier New',monospace;letter-spacing:.25em;color:var(--deep)}
+.mast h1{font-size:clamp(42px,9vw,86px);line-height:1.05;color:white;margin:14px 0 8px;text-shadow:3px 3px 0 #bd2e79,6px 6px 0 #82335f,-2px -2px 0 #82335f}
+.mast p{font-size:19px;font-style:italic}
+.spark{position:absolute;font-size:32px;color:var(--deep)}.spark.one{left:8%;top:20%}.spark.two{right:8%;top:55%}
+.marquee{text-align:center;border-block:2px solid var(--line);padding:11px 0;margin-bottom:26px;font:bold 12px 'Courier New',monospace;letter-spacing:.09em}
+.window{background:var(--paper);border:3px solid var(--ink);box-shadow:9px 9px 0 #e186b8;overflow:hidden}
+.winbar{display:flex;align-items:center;justify-content:space-between;background:#ffe9f4;color:#6c3156;border-bottom:3px solid #6c3156;padding:9px 15px;font:bold 12px 'Courier New',monospace}
+.dots{letter-spacing:3px;color:#d75190}
+.pane{padding:clamp(18px,4vw,34px)}
+h2{font-size:clamp(26px,4vw,35px);margin:0 0 10px}
+.intro{font-size:16px;font-style:italic;line-height:1.5;opacity:.87;margin:0 0 24px}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{padding:15px;background:linear-gradient(140deg,#fff0f8,#fffdfb);border:2px solid #c8759c;color:#542445;box-shadow:5px 5px 0 #ecc0d7}
+.card.darkcard{background:linear-gradient(135deg,#373046,#675071);border-color:#90759c;color:#fff5ff;box-shadow:5px 5px 0 #b995ca}
+.cardtop{display:flex;justify-content:space-between;gap:6px;font:bold 12px 'Courier New',monospace;margin:0 0 10px}
+.stamp{border:1px solid currentColor;padding:3px 6px}
+.portrait{height:215px;position:relative;overflow:hidden;border:2px solid currentColor;background:radial-gradient(circle at 70% 28%,#fff8d5,transparent 42%),linear-gradient(135deg,#ffd0e6,#eab9ec);isolation:isolate}
+.darkcard .portrait,.night .portrait{background:radial-gradient(circle at 70% 30%,#a282ad,transparent 36%),linear-gradient(135deg,#33304b,#8e6998)}
+.portrait:before{content:"✧    ♡     ✧";position:absolute;top:10px;left:10px;font-size:29px;letter-spacing:12px;opacity:.7;white-space:nowrap}
+.person{position:absolute;width:156px;height:215px;left:50%;bottom:-18px;transform:translateX(-50%)}
+.person .hairback{position:absolute;width:124px;height:164px;left:16px;top:6px;border-radius:65px 65px 28px 28px;background:#372d43;border:2px solid #33293e;z-index:1}
+.person .neck{position:absolute;width:29px;height:42px;left:64px;top:118px;background:#f0bda4;border:2px solid #714961;z-index:2}
+.person .jacket{position:absolute;bottom:0;left:-15px;width:186px;height:110px;border-radius:88px 88px 0 0;background:linear-gradient(90deg,#f8f8fe 0 44%,#d6e2ed 44% 49%,#f8f8fe 49%);border:2px solid #59475f;z-index:3}
+.person .face{position:absolute;width:98px;height:120px;left:28px;top:24px;border:2px solid #674b60;border-radius:49% 49% 45% 45%;background:#f6d0b8;z-index:4}
+.person .fringe{position:absolute;left:20px;top:10px;width:116px;height:50px;background:#352d3e;transform:rotate(-8deg);border-radius:66% 40% 55% 15%;z-index:5}
+.person .eye{position:absolute;top:82px;width:8px;height:13px;border-radius:50%;background:#514269;z-index:6}
+.person .eye.left{left:60px}.person .eye.right{left:96px}
+.person .mouth{position:absolute;left:76px;top:119px;width:17px;height:6px;border-bottom:2px solid #a45e7f;border-radius:50%;z-index:6}
+.lucien .person .hairback{background:#202238;height:185px}
+.lucien .person .fringe{background:#202238}
+.lucien .person .jacket{background:linear-gradient(90deg,#28263a 0 42%,#e3d8e9 42% 57%,#28263a 57%)}
+.lucien .person .eye{background:#89446d}
+.card h3{font-size:25px;margin:14px 0 5px}.card p{line-height:1.5;min-height:69px;margin:0 0 14px;font-size:15px}
+.btn{display:inline-block;text-decoration:none;text-align:center;background:#fb78b5;color:#501c44;border:2px solid #74375f;padding:12px 15px;box-shadow:4px 4px 0 #ac6a96;font:bold 13px 'Courier New',monospace;cursor:pointer}
+.btn:hover{background:#ffb2d5}.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #ac6a96}
+.btn.full{width:100%}.btn.soft{background:var(--shade);color:var(--ink);border-color:var(--line)}
+.small{text-align:center;font:12px/1.5 'Courier New',monospace;margin:22px 0 0}
+[hidden]{display:none!important}
+.status{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font:bold 12px 'Courier New',monospace;letter-spacing:.05em;margin-bottom:17px}
+.meter{display:flex;align-items:center;gap:8px}
+.track{width:115px;height:15px;border:2px solid var(--line);overflow:hidden}
+.fill{width:0;height:100%;background:linear-gradient(90deg,#ffafd1,#fb55a5);transition:width .2s}
+.scene{display:grid;grid-template-columns:minmax(210px,1fr) minmax(0,1.4fr);gap:25px}
+.scene .portrait{height:375px;border-color:var(--line)}
+.scene .person{transform:translateX(-50%) scale(1.35);transform-origin:bottom center}
+.slabel{font:bold 12px 'Courier New',monospace;color:var(--deep);letter-spacing:.1em}
+.dialogue{font-size:18px;line-height:1.65;font-style:italic;border-left:4px solid var(--rose);padding:3px 0 3px 17px;margin:20px 0}
+.question{font-weight:bold;line-height:1.55}
+.choices{display:grid;gap:10px;margin-top:12px}
+.choices .btn{text-align:left;text-transform:none;line-height:1.5;color:var(--ink);background:var(--shade);border-color:var(--line);font-size:13px}
+.choices .btn:hover{background:#ffb7db;color:#502341}
+.reply{border:2px dashed var(--line);padding:14px;line-height:1.6;font-style:italic;background:var(--shade);margin-top:18px}
+.ending{text-align:center;max-width:600px;margin:auto;padding:24px 0}
+.ending h2{font-size:clamp(30px,5vw,50px);margin:18px 0}
+.ending p{font-size:18px;line-height:1.8}
+.hearts{font-size:42px;letter-spacing:10px;color:var(--rose)}
+.buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:20px}
+footer{text-align:center;padding:26px 0;font:bold 11px 'Courier New',monospace;letter-spacing:.07em}
+@media(max-width:700px){.routes,.scene{grid-template-columns:1fr}.scene .portrait{height:230px}.scene .person{transform:translateX(-50%) scale(1)}.spark.one{left:0}.spark.two{right:0}.top .smallmark{display:none}.card p{min-height:0}}
+@media(prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="./">← BACK TO GLITCHNET</a><span class="smallmark">LOVE IS A GLITCH IN THE SYSTEM ♡</span></div>
+  <header class="mast"><span class="spark one">✧</span><span class="spark two">♡</span><div class="overline">GLITCHNET PRESENTS</div><h1>♡ ROMANCE.EXE ♡</h1><p>Will you choose love... or will love choose you?</p></header>
+  <div class="marquee">✧ TWO STORIES ✧ SIX ENDINGS ✧ UNLIMITED HEARTS ✧</div>
+  <main class="window">
+    <div class="winbar"><span>♡ love_letter.exe</span><span class="dots">● ● ●</span></div>
+    <section class="pane" id="menu">
+      <h2>Choose your love story ✧</h2><p class="intro">Every glance is a possibility. Every choice changes the ending.</p>
+      <div class="routes">
+        <article class="card elias">
+          <div class="cardtop"><span>ROUTE 01 // THE SCIENTIST</span><span class="stamp">SLOW BURN</span></div>
+          <div class="portrait" role="img" aria-label="Simple illustrated portrait of a dark-haired scientist in a white coat"><div class="person"><div class="hairback"></div><div class="neck"></div><div class="jacket"></div><div class="face"></div><div class="fringe"></div><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div></div>
+          <h3>Dr. Elias Vale</h3><p>He knows the formula for everything. Except the feeling he gets when you enter his laboratory.</p>
+          <button class="btn full" type="button" data-route="elias">♡ BEGIN ELIAS'S ROUTE →</button>
+        </article>
+        <article class="card lucien darkcard">
+          <div class="cardtop"><span>ROUTE 02 // THE LIBRARIAN</span><span class="stamp">MYSTERY</span></div>
+          <div class="portrait" role="img" aria-label="Simple illustrated portrait of a mysterious dark-haired librarian"><div class="person"><div class="hairback"></div><div class="neck"></div><div class="jacket"></div><div class="face"></div><div class="fringe"></div><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div></div>
+          <h3>Lucien Voss</h3><p>He guards a library that only opens at midnight. He also has a secret he's not telling you.</p>
+          <button class="btn full" type="button" data-route="lucien">♡ BEGIN LUCIEN'S ROUTE →</button>
+        </article>
+      </div>
+      <p class="small">✧ MINI DEMO: four chapters per route • play again to discover new endings ✧</p>
+    </section>
+    <section class="pane" id="game" hidden>
+      <div class="status"><span id="chapter">CHAPTER 1 / 4</span><div class="meter"><span>♡ CONNECTION</span><div class="track" role="progressbar" aria-label="Connection level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meter"><div class="fill" id="fill"></div></div><span id="score">0 / 8</span></div></div>
+      <div class="scene">
+        <div class="portrait elias" role="img" id="scene-portrait" aria-label="Illustrated character portrait"><div class="person"><div class="hairback"></div><div class="neck"></div><div class="jacket"></div><div class="face"></div><div class="fringe"></div><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div></div>
+        <div><div id="setting" class="slabel"></div><h2 id="scene-title"></h2><div class="dialogue" id="dialogue"></div><p class="question" id="question"></p><div class="choices" id="choices"></div><div class="reply" id="reply" aria-live="polite" hidden></div></div>
+      </div>
+      <p class="small"><button type="button" class="btn soft" id="menu-link">← BACK TO CHARACTERS</button></p>
+    </section>
+    <section class="pane ending" id="ending" hidden>
+      <div class="slabel">✧ YOUR STORY'S ENDING ✧</div><div class="hearts">♡ ♡ ♡</div><h2 id="end-title"></h2><p id="end-text"></p>
+      <div class="buttons"><button class="btn" id="retry">↻ PLAY AGAIN</button><button class="btn soft" id="choose-again">CHOOSE ANOTHER ROUTE</button></div>
+    </section>
+  </main>
+  <footer>© GLITCHNET ♡ WRITTEN IN THE STARS (AND JAVASCRIPT)</footer>
+</div>
+<script>
+(function(){
+  'use strict';
+  const stories={
+    elias:{
+      scenes:[
+        {title:'A Chance Reaction',where:'THE LAB • 7:42 PM',say:'"You are late," says the scientist without looking up. Then he quietly slides a cup of tea across the table. It is exactly how you like it.',ask:'How do you respond?',choices:[
+          ['"You remembered my tea order?"',2,'"It was... not difficult to remember." He looks away, but you catch a slight smile.'],
+          ['"What are you working on?"',1,'"A rather delicate experiment." He clears a space for you at the bench.'],
+          ['"I actually need to go."',0,'His fingers pause on the teacup. "Of course. Another time."']
+        ]},
+        {title:'An Unexpected Variable',where:'THE LAB • RAINY EVENING',say:'Rain rattles against the window. Elias hesitates, holding an umbrella. "I have no immediate plans. I could walk you home."',ask:'What will you say?',choices:[
+          ['"Only if we share the umbrella."',2,'"That seems... logical." He steps a little closer.'],
+          ['"That would be nice, thank you."',1,'"Then we should go before the storm worsens."'],
+          ['"No, I will manage."',0,'"As you wish." The umbrella remains unopened.']
+        ]},
+        {title:'Among the Stars',where:'OBSERVATORY ROOF • 10:03 PM',say:'He leads you to the roof, away from the noise below. "I wanted to show you something," he murmurs, pointing at the constellations.',ask:'How do you spend this quiet moment?',choices:[
+          ['Stand beside him quietly.',2,'After a long silence he says, almost inaudibly, "It is easier to breathe when you are here."'],
+          ['"What is your favorite constellation?"',1,'"Do you have three hours?" he replies, very seriously.'],
+          ['Check your phone until he speaks.',0,'He returns his gaze to the skyline. The moment drifts by.']
+        ]},
+        {title:'A Small Hypothesis',where:'THE LAB • NEXT MORNING',say:'A second cup of tea waits at your usual seat. "It would be... efficient," he says, "if you came back tomorrow."',ask:'What is your answer?',choices:[
+          ['"Is that a research proposal or a date?"',2,'The tips of his ears turn pink. "I had hoped... perhaps both."'],
+          ['"I would like that. Same time?"',1,'His shoulders relax. "Yes. Same time."'],
+          ['"Maybe. I am busy."',0,'"Understood," he says, closing his notebook.']
+        ]}
+      ],
+      endings:{
+        high:['♡ The Equation of Us','He did not believe in fate, only in evidence. And every day became better when you were there. On the rooftop, Elias finally takes your hand. "I would like to continue this experiment," he says. "Indefinitely."'],
+        mid:['♡ A Slow-Burning Reaction','Your visits become a familiar rhythm: warm tea, quiet experiments, and a reserved scientist saving you the chair beside him. One evening he asks you to dinner. His voice is neutral. His face is not.'],
+        low:['♡ Parallel Orbits','Your paths crossed in a quiet laboratory and then slowly diverged. Sometimes Elias still leaves the door open a moment longer than he needs to. Not every romance begins with a confession.']
+      }
+    },
+    lucien:{
+      scenes:[
+        {title:'The Last Page',where:'THE LIBRARY • MIDNIGHT',say:'"We closed at eleven," says the man by the window. A silver bookmark glints between his fingers. "You must be lost, or unusually devoted to literature."',ask:'Why did you come?',choices:[
+          ['"I seek a book nobody else remembers."',2,'His eyes sharpen. "Now that is an excellent reason to be here."'],
+          ['"I needed somewhere quiet."',1,'The corner of his mouth lifts. "Then you have found it."'],
+          ['"Sorry. I will leave."',0,'He watches the door close behind you.']
+        ]},
+        {title:'The Locked Wing',where:'EAST CORRIDOR • 12:22 AM',say:'Soft music rises from behind an iron gate. Lucien studies the old lock. "There are stories in this wing that prefer not to be disturbed."',ask:'Do you follow him?',choices:[
+          ['"I am curious, but I will follow your lead."',2,'He unlocks the gate. "An unexpectedly sensible answer."'],
+          ['"Are you secretly a vampire?"',1,'He raises an eyebrow. "Would you believe me if I said yes?"'],
+          ['"That is creepy. Goodbye."',0,'He steps aside. "Then goodnight."']
+        ]},
+        {title:'A Book Without a Name',where:'READING ROOM • 12:51 AM',say:'He gives you a battered book. A sentence appears across its blank pages: SOME SECRETS ASK TO BE KEPT. Lucien looks almost afraid.',ask:'How do you respond?',choices:[
+          ['"You can tell me when you are ready."',2,'His voice softens. "I am not used to being given that choice."'],
+          ['"I have approximately a thousand questions."',1,'He almost laughs. "I had gathered as much."'],
+          ['"This seems like too much trouble."',0,'Something closes behind his expression. "Perhaps it is."']
+        ]},
+        {title:'Before Sunrise',where:'LIBRARY STEPS • 5:58 AM',say:'Dawn approaches. Lucien remains beneath the doorframe. "You could return tomorrow," he says. "If you wish."',ask:'What do you say?',choices:[
+          ['"Save me a seat. I will bring a bookmark."',2,'He smiles openly for the first time. "I believe I can arrange that."'],
+          ['"There is still a lot I want to know."',1,'"Then perhaps I should tell you another story."'],
+          ['"Maybe another time."',0,'"Another time," he echoes as the door closes.']
+        ]}
+      ],
+      endings:{
+        high:['♡ The Book of Forever','At the next midnight, a new volume waits for you. Its title is your name. Inside, the first page reads: THIS IS THE BEGINNING. Lucien waits beside the window. "Some stories," he says, "are better written together."'],
+        mid:['♡ A Midnight Invitation','You begin returning to the library after dark. Lucien remembers your favorite books, leaves the lamp on, and finds room for a second chair beside his window. Neither of you has to name the invitation.'],
+        low:['♡ The Unfinished Chapter','The tall library windows still glow after midnight. Somewhere inside, an unsigned bookmark waits in a book you have not read. Some stories prefer to remain mysteries, at least for now.']
+      }
+    }
+  };
+  const $=id=>document.getElementById(id);
+  let route='',chapter=0,points=0;
+  const sections=['menu','game','ending'];
+  function screen(name){
+    sections.forEach(id=>$(id).hidden=id!==name);
+    document.querySelector('.window').scrollIntoView({behavior:'auto',block:'start'});
+  }
+  function meter(){
+    const pct=Math.round(points/8*100);
+    $('fill').style.width=pct+'%';$('meter').setAttribute('aria-valuenow',String(pct));$('score').textContent=points+' / 8';
+  }
+  function start(name){
+    route=name;chapter=0;points=0;
+    document.body.classList.toggle('night',name==='lucien');
+    $('scene-portrait').className='portrait '+name;
+    $('scene-portrait').setAttribute('aria-label','Illustrated portrait of '+(name==='elias'?'Dr. Elias Vale':'Lucien Voss'));
+    screen('game');showScene();
+  }
+  function action(text,callback){
+    const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=text;b.addEventListener('click',callback);return b;
+  }
+  function showScene(){
+    const s=stories[route].scenes[chapter];
+    $('chapter').textContent='CHAPTER '+(chapter+1)+' / 4';$('setting').textContent=s.where;
+    $('scene-title').textContent=s.title;$('dialogue').textContent=s.say;$('question').textContent=s.ask;
+    $('reply').hidden=true;$('reply').textContent='';$('choices').replaceChildren();meter();
+    s.choices.forEach(c=>$('choices').append(action('♡ '+c[0],()=>select(c))));
+  }
+  function select(c){
+    points+=c[1];meter();$('reply').textContent=c[2];$('reply').hidden=false;
+    $('question').textContent='';$('choices').replaceChildren();
+    const last=chapter===3;
+    $('choices').append(action(last?'♡ SEE YOUR ENDING →':'CONTINUE THE STORY →',()=>{
+      if(last){end()}else{chapter++;showScene();}
+    }));
+  }
+  function end(){
+    const type=points>=6?'high':points>=3?'mid':'low';
+    const ending=stories[route].endings[type];
+    $('end-title').textContent=ending[0];$('end-text').textContent=ending[1];screen('ending');
+  }
+  function menu(){document.body.classList.remove('night');screen('menu')}
+  document.querySelectorAll('[data-route]').forEach(button=>button.addEventListener('click',()=>start(button.dataset.route)));
+  $('retry').addEventListener('click',()=>start(route));
+  $('choose-again').addEventListener('click',menu);
+  $('menu-link').addEventListener('click',menu);
+})();
+</script>
+</body>
+</html>
