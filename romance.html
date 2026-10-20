@@ -77,7 +77,7 @@ h2{font-size:clamp(26px,4vw,35px);margin:0 0 10px}
 .hearts{font-size:42px;letter-spacing:10px;color:var(--rose)}
 .buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:20px}
 footer{text-align:center;padding:26px 0;font:bold 11px 'Courier New',monospace;letter-spacing:.07em}
-.elias-art{background-image:var(--elias-img)!important;background-size:cover!important;background-position:50% 40%!important}.scene .elias-art{background-position:25% 50%!important}
+.elias-art .person{display:none!important}.elias-art{background-image:var(--elias-img)!important;background-size:cover!important;background-position:50% 40%!important}.scene .elias-art{background-position:25% 50%!important}
 @media(max-width:700px){.routes,.scene{grid-template-columns:1fr}.scene .portrait{height:230px}.scene .person{transform:translateX(-50%) scale(1)}.spark.one{left:0}.spark.two{right:0}.top .smallmark{display:none}.card p{min-height:0}}
 @media(prefers-reduced-motion:reduce){.fill{transition:none}}
 </style>
@@ -110,7 +110,7 @@ footer{text-align:center;padding:26px 0;font:bold 11px 'Courier New',monospace;l
     <section class="pane" id="game" hidden>
       <div class="status"><span id="chapter">CHAPTER 1 / 4</span><div class="meter"><span>♡ CONNECTION</span><div class="track" role="progressbar" aria-label="Connection level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meter"><div class="fill" id="fill"></div></div><span id="score">0 / 8</span></div></div>
       <div class="scene">
-        <div class="portrait elias-art" role="img" id="scene-portrait" aria-label="Dr. Elias Vale in his laboratory"></div>
+        <div class="portrait elias-art" role="img" id="scene-portrait" aria-label="Dr. Elias Vale in his laboratory"><div class="person"><div class="hairback"></div><div class="neck"></div><div class="jacket"></div><div class="face"></div><div class="fringe"></div><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div></div></div>
         <div><div id="setting" class="slabel"></div><h2 id="scene-title"></h2><div class="dialogue" id="dialogue"></div><p class="question" id="question"></p><div class="choices" id="choices"></div><div class="reply" id="reply" aria-live="polite" hidden></div></div>
       </div>
       <p class="small"><button type="button" class="btn soft" id="menu-link">← BACK TO CHARACTERS</button></p>
