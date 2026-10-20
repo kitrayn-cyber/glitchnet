@@ -47,6 +47,8 @@
     <button onclick="show('home')">HOME</button>
     <button onclick="show('quiz')">QUIZZES</button>
     <button onclick="show('avatar')">AVATARS</button>
+    <button onclick="show('games')">GAMES</button>
+    <button onclick="location.href='romance.html'">♡ ROMANCE.EXE</button>
   </nav>
 
   <div id="home" class="box">
@@ -67,9 +69,14 @@
     <p>Coming soon! ★</p>
   </div>
 
+  <div id="games" class="box" hidden>
+    <h2>★ GLITCH ACADEMY ★</h2>
+    <p>Enter a pixel school, explore classrooms, and learn through real experiments and games. Coming soon!</p>
+  </div>
+
   <script>
     function show(page) {
-      ['home', 'quiz', 'avatar'].forEach(id => {
+      ['home', 'quiz', 'avatar', 'games'].forEach(id => {
         document.getElementById(id).hidden = id !== page;
       });
     }
