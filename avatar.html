@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>★ GlitchNet Avatar Studio ★</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(#fff 1px,transparent 2px) 0 0/30px 30px,linear-gradient(135deg,#a8dafa,#c6bcff 65%,#fee1f6);color:#313464;font:14px Verdana,sans-serif;min-height:100vh}header{padding:15px;text-align:center;background:linear-gradient(#f9fbff,#a5b1ee 48%,#677dca);border-bottom:4px ridge #fff}header h1{margin:4px;font:900 clamp(22px,5vw,36px) Tahoma,Verdana,sans-serif;text-shadow:2px 2px white}header p{margin:6px}a{color:#3949a4}main{max-width:940px;margin:23px auto;padding:0 14px 55px}.window{background:#eef2ff;border:3px ridge white;box-shadow:6px 7px #6175b377}.bar{background:linear-gradient(#f9faff,#c7d4ff 45%,#8698d9 52%,#7689c7);padding:11px;font-weight:bold;border-bottom:2px ridge white;display:flex;justify-content:space-between}.layout{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.25fr);gap:19px;padding:18px}.preview{text-align:center;display:flex;flex-direction:column;align-items:center;gap:13px}.stage{background:repeating-linear-gradient(45deg,#d9e8ff 0 12px,#c3d7f5 12px 24px);padding:17px;border:3px inset white;width:100%;min-height:290px;display:grid;place-items:center}canvas{width:min(100%,260px);height:auto;aspect-ratio:1;image-rendering:pixelated;box-shadow:3px 4px 0 #8391bf;border:4px solid white;background:white}#smallCanvas{width:74px;border-width:3px}.identity{display:flex;gap:10px;align-items:center;justify-content:center;background:white;padding:9px;border:2px inset #b9c3e8;width:100%}.identity span{font-weight:bold}fieldset{border:2px ridge #b5c3ff;margin:0 0 12px;padding:10px;background:#fffaff}legend{font-weight:bold;background:#d5deff;border:2px outset white;padding:4px 8px;font-size:12px}.swatches{display:flex;flex-wrap:wrap;gap:8px}.swatch{width:34px;height:34px;background:var(--s);border:3px outset #fff;cursor:pointer;padding:0}.swatch[aria-pressed=true]{outline:3px solid #465cb9;outline-offset:2px}.options{display:flex;flex-wrap:wrap;gap:6px}button,.back{cursor:pointer;font:700 12px Tahoma,Verdana,sans-serif;color:#384a85;padding:9px 12px;border:2px outset white;background:linear-gradient(#fff,#d3dcfa 55%,#abbbe9);border-radius:2px}button[aria-pressed=true]{background:#b1beee;outline:2px solid #657ac0}.actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}.primary{background:linear-gradient(#fff,#dbe2ff 35%,#8f9fe1);font-size:14px;padding:12px 16px}.notice{min-height:20px;font-weight:bold;color:#385c8c;text-align:center}.tag{display:inline-block;background:#fff8ff;border:2px ridge #fff;padding:6px;font-size:11px}.back{display:inline-block;text-decoration:none;margin-bottom:14px}@media(max-width:650px){.layout{grid-template-columns:1fr;padding:10px}.stage{min-height:230px}canvas{width:205px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style></head><body><header><h1>★ AVATAR STUDIO.EXE ★</h1><p>CREATE YOUR LITTLE PIXEL SELF ✧ 2005 INTERNET EDITION</p></header><main><a class="back" href="home.html">← Back to GlitchNet</a><div class="window"><div class="bar"><span>☻ pixel_doll_maker.exe</span><span>□ ×</span></div><div class="layout"><section class="preview"><div class="stage"><canvas id="portrait" width="48" height="48" role="img" aria-label="Your customized pixel avatar"></canvas></div><div class="identity"><canvas id="smallCanvas" width="48" height="48" aria-hidden="true"></canvas><div><span>glitchkitten</span><br><small>★ YOUR NEW PFP ★</small></div></div><span class="tag">✦ MADE OF PIXELS ✦</span><div class="actions"><button class="primary" id="save" type="button">♥ Set as My PFP</button><button id="download" type="button">↓ Save PNG</button><button id="random" type="button">🎲 Surprise Me</button></div><p id="notice" class="notice" aria-live="polite">Customize your avatar, then save it!</p><small>Your profile picture saves locally in this browser.</small></section><section aria-label="Customize your avatar"><fieldset><legend>01 · SKIN TONE</legend><div class="swatches" id="skin"></div></fieldset><fieldset><legend>02 · HAIR STYLE</legend><div class="options" id="hairStyle"></div></fieldset><fieldset><legend>03 · HAIR COLOR</legend><div class="swatches" id="hairColor"></div></fieldset><fieldset><legend>04 · EYES</legend><div class="options" id="eyes"></div></fieldset><fieldset><legend>05 · OUTFIT</legend><div class="options" id="outfit"></div></fieldset><fieldset><legend>06 · SHIRT COLOR</legend><div class="swatches" id="shirt"></div></fieldset><fieldset><legend>07 · ACCESSORIES</legend><div class="options" id="accessory"></div></fieldset><fieldset><legend>08 · BACKGROUND</legend><div class="swatches" id="background"></div></fieldset></section></div></div></main>
+<script>
+(()=>{
+'use strict';
+const KEY='glitchnet-avatar-v1',PFP='glitchnet-pfp-v1';
+const sets={skin:['#f6d3b7','#e7b48f','#c99266','#9c6347','#684235','#ffdbcb'],hairColor:['#21192e','#5a332b','#a76437','#f5d17a','#ece4ee','#fa9ad3','#86baf2'],shirt:['#e6a4ed','#8195ec','#303b70','#90c6a2','#f7c774','#fefefe','#fb8cae'],background:['#b7c4ff','#b4eef2','#ffd2ed','#f6dc99','#e4d7f7','#8ca4d6'],hairStyle:['Long','Bob','Short','Spiky','Pigtails','Bald'],eyes:['Blue','Brown','Green','Violet','Dark'],outfit:['Sweater','T-shirt','Jacket','Dress'],accessory:['None','Glasses','Bow','Star','Headphones']};
+const eyeColors={Blue:'#5385d4',Brown:'#6e442e',Green:'#428f73',Violet:'#8f65be',Dark:'#29223d'};
+const defaults={skin:0,hairColor:3,shirt:0,background:0,hairStyle:0,eyes:0,outfit:0,accessory:0};
+let state={...defaults};try{const prior=JSON.parse(localStorage.getItem(KEY)||'null');if(prior)for(const k of Object.keys(defaults))if(Number.isInteger(prior[k])&&prior[k]>=0&&prior[k]<sets[k].length)state[k]=prior[k]}catch(_){}
+const canvas=document.getElementById('portrait'),ctx=canvas.getContext('2d'),small=document.getElementById('smallCanvas');
+ctx.imageSmoothingEnabled=false;
+function draw(){
+ const S=(key)=>sets[key][state[key]],skin=S('skin'),hair=S('hairColor'),shirt=S('shirt'),bg=S('background'),style=S('hairStyle'),acc=S('accessory');
+ const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+ ctx.clearRect(0,0,48,48);p(0,0,48,48,bg);
+ for(let i=0;i<36;i++){let x=(i*17+7)%48,y=(i*23+5)%48;if((x+y)%4===0)p(x,y,1,1,'#ffffff77')}
+ p(4,41,40,7,'#ffffff55');
+ // Body and shoulders, with a dark pixel outline.
+ p(6,38,36,10,'#38334d');p(8,36,32,12,shirt);p(12,33,24,10,shirt);
+ if(S('outfit')==='Jacket'){p(8,36,9,12,'#484d79');p(31,36,9,12,'#484d79');p(21,36,6,12,'#f7f1ff')}
+ if(S('outfit')==='Dress'){p(6,43,36,5,shirt);p(19,38,10,2,'#fff9')}
+ if(S('outfit')==='Sweater')p(19,35,10,4,'#ffffff88');
+ if(S('outfit')==='T-shirt')p(21,38,6,3,'#fff9');
+ // Neck, hair behind head, ears.
+ p(20,32,8,7,skin);
+ if(style==='Long'||style==='Bob'||style==='Pigtails'){p(12,10,24,28,hair);p(10,20,6,20,hair);p(32,20,6,20,hair)}
+ if(style==='Pigtails'){p(5,20,8,17,hair);p(35,20,8,17,hair);p(5,19,8,4,'#fff5');p(35,19,8,4,'#fff5')}
+ p(15,15,18,19,'#4a3640');p(16,16,16,17,skin);p(13,23,3,7,skin);p(32,23,3,7,skin);
+ p(17,30,14,3,skin);
+ if(style!=='Bald'){
+  p(13,9,22,7,hair);p(14,7,18,4,hair);p(12,13,5,13,hair);p(31,12,5,14,hair);
+  if(style==='Short'){p(12,12,5,8,hair);p(31,12,5,7,hair)}
+  if(style==='Spiky'){p(11,5,5,10,hair);p(17,3,5,10,hair);p(26,4,5,11,hair);p(33,7,4,12,hair)}
+  if(style==='Bob'){p(10,21,5,13,hair);p(33,21,5,13,hair)}
+  p(16,15,7,4,hair);p(23,14,9,3,hair);
+ }
+ // Eyes and mouth
+ const ec=eyeColors[S('eyes')];p(18,23,4,4,'#fff');p(27,23,4,4,'#fff');p(19,24,2,3,ec);p(28,24,2,3,ec);p(19,24,1,1,'#fff');p(28,24,1,1,'#fff');
+ p(23,27,2,1,'#cc907f');p(22,30,5,1,'#975765');
+ if(acc==='Glasses'){p(16,22,8,6,'#353759');p(25,22,8,6,'#353759');p(18,23,5,4,'#e6edffb5');p(26,23,5,4,'#e6edffb5');p(23,23,3,1,'#353759')}
+ if(acc==='Bow'){p(9,11,7,5,'#fe6ea9');p(17,12,3,3,'#ffe9f6');p(20,11,6,5,'#fe6ea9')}
+ if(acc==='Star'){p(33,13,3,9,'#ffef86');p(30,16,9,3,'#ffef86');p(32,15,5,5,'#fff1a4')}
+ if(acc==='Headphones'){p(12,12,3,18,'#4b5c9f');p(33,12,3,18,'#4b5c9f');p(15,9,18,3,'#4b5c9f');p(11,23,5,8,'#c0cdfb');p(32,23,5,8,'#c0cdfb')}
+ const sm=small.getContext('2d');sm.imageSmoothingEnabled=false;sm.clearRect(0,0,48,48);sm.drawImage(canvas,0,0);
+}
+function controls(){for(const [key,opts] of Object.entries(sets)){const box=document.getElementById(key);opts.forEach((v,i)=>{const b=document.createElement('button');b.type='button';const color=['skin','hairColor','shirt','background'].includes(key);b.className=color?'swatch':'';b.textContent=color?'':v;b.style.setProperty('--s',color?v:'');b.setAttribute('aria-label',color?key+' color '+(i+1):v);b.setAttribute('aria-pressed',String(state[key]===i));b.addEventListener('click',()=>{state[key]=i;box.querySelectorAll('button').forEach((el,j)=>el.setAttribute('aria-pressed',String(i===j)));draw();document.getElementById('notice').textContent='Looking good! Save to update your PFP.'});box.append(b)})}}
+function sync(){for(const key of Object.keys(sets))document.getElementById(key).querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-pressed',String(i===state[key])));draw()}
+document.getElementById('random').addEventListener('click',()=>{for(const k of Object.keys(sets))state[k]=Math.floor(Math.random()*sets[k].length);sync();document.getElementById('notice').textContent='A new pixel identity appears!'});
+document.getElementById('save').addEventListener('click',()=>{try{localStorage.setItem(KEY,JSON.stringify(state));localStorage.setItem(PFP,canvas.toDataURL('image/png'));document.getElementById('notice').textContent='★ PFP SAVED! Visit GlitchNet home to see it. ★'}catch(e){document.getElementById('notice').textContent='Unable to save here. Try the PNG download.'}});
+document.getElementById('download').addEventListener('click',()=>{const a=document.createElement('a');a.download='glitchnet-avatar.png';a.href=canvas.toDataURL('image/png');a.click()});
+controls();draw();
+})();
+</script></body></html>
