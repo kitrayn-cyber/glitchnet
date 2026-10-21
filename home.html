@@ -196,7 +196,10 @@
   @media(max-width:690px){.desk{padding:12px 10px 110px}.top-strip{grid-template-columns:1fr;gap:12px}.status-chip{grid-column:auto;grid-row:auto}.main-grid{grid-template-columns:1fr}.left-side nav{grid-template-columns:repeat(2,minmax(0,1fr))}.left-side nav button,.left-side nav a{text-align:center;font-size:11px}.left-side{grid-template-columns:1fr}.main-area{grid-column:1}.right-side{grid-column:1;grid-template-columns:1fr}.panel-row{grid-template-columns:1fr}.logo-card h1{white-space:normal}.portal-land{height:175px}}
   @media (prefers-reduced-motion: reduce){.logo-card,.loose-tag,.status-chip,.sticker{transform:none}}
   </style>
-</head>
+<style>
+.gn-auth{position:relative;z-index:5;background:linear-gradient(#fbfdff,#dfe5ff 52%,#b5c5ff);color:#343f84;border:3px ridge white;box-shadow:4px 4px 0 #7082be;padding:10px 12px;margin:12px auto;max-width:430px;font:12px Verdana,sans-serif;text-align:center}
+.gn-auth strong{font-size:13px}.gn-auth button{background:linear-gradient(white,#e1e9ff,#becdf9);color:#334987;border:2px outset #fff;padding:10px 12px;cursor:pointer;font-weight:bold}.gn-auth button:disabled{opacity:.6;cursor:wait}.gn-auth-note{font-size:11px;margin:6px 0;word-wrap:break-word}.gn-auth[hidden]{display:none!important}
+</style></head>
 
 <body>
   <div class="starfield">
@@ -226,7 +229,7 @@
       <div class="loose-tag">★ THE WEIRD SIDE OF THE INTERNET ★<small>best viewed with curiosity • established 2026</small></div>
       <div class="status-chip"><strong>● ONLINE</strong><br>YOUR INTERNET DIMENSION</div>
     </div>
-    <div class="main-grid">
+    <section class="gn-auth" id="glitchnet-auth" aria-label="GlitchNet account"><strong>★ GLITCHNET PASSPORT ★</strong><p id="gn-auth-status" class="gn-auth-note">Checking login…</p><button type="button" id="gn-google-button" hidden>🌐 Sign in with Google</button><button type="button" id="gn-signout-button" hidden>Sign out</button><p class="gn-auth-note">Cloud login is being set up. Avatar saves are still local to this browser.</p></section><div class="main-grid">
       <aside class="left-side">
         <div class="window">
           <div class="window-bar"><span>✦ navigation.exe</span><span>▣ ×</span></div>
@@ -455,5 +458,19 @@
     mystery.setAttribute('aria-expanded',String(!mysteryText.hidden));
   });
   </script>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(()=>{
+ 'use strict';
+ const box=document.getElementById('glitchnet-auth'),status=document.getElementById('gn-auth-status'),login=document.getElementById('gn-google-button'),out=document.getElementById('gn-signout-button');
+ if(!box)return;
+ if(!window.supabase?.createClient){status.textContent='Login library did not load. Check your connection and refresh.';return;}
+ const client=window.supabase.createClient('https://sjqmmajsyjfjaeixnbto.supabase.co','sb_publishable_IqsQOAeqYL7Ek6Ii2KYivA_Zr8agFDo',{auth:{flowType:'pkce',detectSessionInUrl:true,autoRefreshToken:true,persistSession:true}});
+ function paint(session){const user=session?.user;status.textContent=user?'Signed in as '+(user.email||'GlitchNet member'):'Not signed in yet ✧';login.hidden=!!user;out.hidden=!user;}
+ client.auth.getSession().then(({data,error})=>{if(error){status.textContent='Login error: '+error.message;login.hidden=false}else paint(data.session)}).catch(()=>{status.textContent='Could not reach Supabase.';login.hidden=false});
+ client.auth.onAuthStateChange((_event,session)=>paint(session));
+ login.addEventListener('click',async()=>{login.disabled=true;status.textContent='Opening Google sign-in…';try{const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:new URL('home.html',window.location.href).href}});if(error)throw error}catch(e){status.textContent=e.message||'Google login could not start.';login.disabled=false}});
+ out.addEventListener('click',async()=>{out.disabled=true;const {error}=await client.auth.signOut();if(error)status.textContent=error.message;out.disabled=false});
+})();
+</script></body>
 </html>
