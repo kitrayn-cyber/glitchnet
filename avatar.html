@@ -19,14 +19,8 @@ function draw(){
  ctx.clearRect(0,0,48,48);p(0,0,48,48,bg);
  for(let i=0;i<36;i++){let x=(i*17+7)%48,y=(i*23+5)%48;if((x+y)%4===0)p(x,y,1,1,'#ffffff77')}
  p(4,41,40,7,'#ffffff55');
- // Body and shoulders, with a dark pixel outline.
- p(6,38,36,10,'#38334d');p(8,36,32,12,shirt);p(12,33,24,10,shirt);
- if(S('outfit')==='Jacket'){p(8,36,9,12,'#484d79');p(31,36,9,12,'#484d79');p(21,36,6,12,'#f7f1ff')}
- if(S('outfit')==='Dress'){p(6,43,36,5,shirt);p(19,38,10,2,'#fff9')}
- if(S('outfit')==='Sweater')p(19,35,10,4,'#ffffff88');
- if(S('outfit')==='T-shirt')p(21,38,6,3,'#fff9');
  // Hair is drawn BEHIND the neck and face. Bob stops at the jaw;
- // long hair extends to the bottom of the portrait and over shoulders.
+ // long hair extends behind the shoulders rather than covering the shirt.
  if(style==='Long'){
    p(11,11,26,35,hair);p(8,23,8,25,hair);p(32,23,8,25,hair);
    p(7,36,8,12,hair);p(33,36,8,12,hair);
@@ -39,6 +33,12 @@ function draw(){
    p(13,11,22,20,hair);p(6,20,8,18,hair);p(34,20,8,18,hair);
    p(6,19,8,4,'#fff5');p(34,19,8,4,'#fff5');
  }
+ // Body and shoulders, with a dark pixel outline.
+ p(6,38,36,10,'#38334d');p(8,36,32,12,shirt);p(12,33,24,10,shirt);
+ if(S('outfit')==='Jacket'){p(8,36,9,12,'#484d79');p(31,36,9,12,'#484d79');p(21,36,6,12,'#f7f1ff')}
+ if(S('outfit')==='Dress'){p(6,43,36,5,shirt);p(19,38,10,2,'#fff9')}
+ if(S('outfit')==='Sweater')p(19,35,10,4,'#ffffff88');
+ if(S('outfit')==='T-shirt')p(21,38,6,3,'#fff9');
  // Visible neck goes over the background hair.
  p(20,31,8,7,'#654b50');p(21,31,6,7,skin);
  p(15,15,18,19,'#4a3640');p(16,16,16,17,skin);
@@ -56,7 +56,7 @@ function draw(){
    }
    if(style==='Long'){
      p(10,21,5,17,hair);p(33,21,5,17,hair);
-     p(10,36,5,12,hair);p(33,36,5,12,hair);
+     p(10,36,3,12,hair);p(35,36,3,12,hair);
    }
    p(16,15,7,4,hair);p(23,14,9,3,hair);
  }
