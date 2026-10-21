@@ -253,7 +253,7 @@
         <div class="netbox">✧ YOU ARE HERE ✧<p>somewhere on the internet</p><span class="sticker">HELLO WORLD!</span></div>
       </aside>
       <main class="main-area">
-        <section id="home" class="site-screen" aria-label="Home">
+        <section id="home" class="site-screen" aria-label="Home"><div class="window" style="margin-bottom:14px"><div class="window-bar"><span>☻ your.profile</span><span>● ONLINE</span></div><div class="window-body" style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap"><img class="gn-pfp" alt="Your saved pixel profile picture" width="76" height="76" style="image-rendering:pixelated;border:3px ridge white;background:#cdd4ff;display:none"><div><strong>glitchkitten</strong><br><small class="gn-pfp-caption">No avatar yet!</small><br><a href="avatar.html">✧ Make / edit my pixel PFP →</a></div></div></div>
           <div class="window">
             <div class="window-bar"><span>✿ welcome.exe</span><span>□ ×</span></div>
             <div class="welcome-banner">
@@ -293,7 +293,7 @@
           <button onclick="answer('Scene Royalty')">Concert</button>
           <p id="result" aria-live="polite"></p>
         </section>
-        <section id="avatar" class="box" hidden><h2>AVATAR STUDIO</h2><p>Coming soon! ★</p></section>
+        <section id="avatar" class="box" hidden><h2>★ AVATAR STUDIO ★</h2><p>Build your own pixel character, pick the outfit and hair, then make it your GlitchNet profile picture!</p><p><a href="avatar.html" style="display:inline-block;background:#c2caff;color:#252953;padding:13px;border:3px outset #fff;font-weight:bold">☻ OPEN PIXEL AVATAR CREATOR →</a></p><div class="gn-avatar-profile" style="display:flex;justify-content:center;margin-top:12px"><img class="gn-pfp" alt="Your GlitchNet profile picture" width="86" height="86" style="image-rendering:pixelated;border:4px ridge white;background:#cdd4ff;display:none"></div><p class="gn-pfp-caption">No PFP saved yet ✧</p></section>
         <section id="games" class="box" hidden><h2>★ GLITCH ACADEMY ★</h2><p>Enter a pixel school, explore classrooms, and learn through actual experiments and games. Coming soon!</p></section>
       </main>
       <aside class="right-side">
@@ -436,6 +436,12 @@
       document.getElementById('result').textContent =
         'Your alter ego is: ' + result + '!';
     }
+  </script>
+  <script>
+  (()=>{const url=localStorage.getItem('glitchnet-pfp-v1');if(!url)return;
+    document.querySelectorAll('.gn-pfp').forEach(img=>{img.src=url;img.style.display='block'});
+    document.querySelectorAll('.gn-pfp-caption').forEach(el=>el.textContent='★ Your pixel avatar is active! ★');
+  })();
   </script>
 
   <script>
