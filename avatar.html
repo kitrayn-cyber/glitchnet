@@ -27,7 +27,9 @@ function draw(){
  if(S('outfit')==='T-shirt')p(21,38,6,3,'#fff9');
  // Neck, hair behind head, ears.
  p(20,32,8,7,skin);
- if(style==='Long'||style==='Bob'||style==='Pigtails'){p(12,10,24,28,hair);p(10,20,6,20,hair);p(32,20,6,20,hair)}
+ if(style==='Long'){p(12,10,24,33,hair);p(10,19,6,25,hair);p(32,19,6,25,hair);p(11,39,7,7,hair);p(30,39,7,7,hair)}
+ if(style==='Bob'){p(13,10,22,23,hair);p(11,17,6,15,hair);p(31,17,6,15,hair)}
+ if(style==='Pigtails'){p(13,10,22,23,hair);p(11,18,6,13,hair);p(31,18,6,13,hair)}
  if(style==='Pigtails'){p(5,20,8,17,hair);p(35,20,8,17,hair);p(5,19,8,4,'#fff5');p(35,19,8,4,'#fff5')}
  p(15,15,18,19,'#4a3640');p(16,16,16,17,skin);p(13,23,3,7,skin);p(32,23,3,7,skin);
  p(17,30,14,3,skin);
@@ -35,7 +37,7 @@ function draw(){
   p(13,9,22,7,hair);p(14,7,18,4,hair);p(12,13,5,13,hair);p(31,12,5,14,hair);
   if(style==='Short'){p(12,12,5,8,hair);p(31,12,5,7,hair)}
   if(style==='Spiky'){p(11,5,5,10,hair);p(17,3,5,10,hair);p(26,4,5,11,hair);p(33,7,4,12,hair)}
-  if(style==='Bob'){p(10,21,5,13,hair);p(33,21,5,13,hair)}
+  if(style==='Bob'){p(10,20,5,11,hair);p(33,20,5,11,hair);p(11,30,7,3,hair);p(30,30,7,3,hair)}
   p(16,15,7,4,hair);p(23,14,9,3,hair);
  }
  // Eyes and mouth
