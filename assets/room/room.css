@@ -1,0 +1,18 @@
+/* Scoped room additions. Existing artwork and global GlitchNet styles remain intact. */
+#phaser-room{display:none;width:100%;aspect-ratio:16/9;background:#e8dff0;position:relative}
+#room-scene.phaser-active{height:auto;min-height:0;aspect-ratio:16/9;overflow:hidden}
+#room-scene.phaser-active>#phaser-room{display:block}
+#room-scene.phaser-active>.illustrated-room,#room-scene.phaser-active>.art-hotspots,#room-scene.phaser-active>svg,#room-scene.phaser-active>.play-layer{display:none}
+#phaser-room canvas{display:block;image-rendering:pixelated;max-width:100%;outline-offset:-4px}
+#phaser-room canvas:focus-visible{outline:3px dashed #a477b5}
+.room-actions,.owned-actions{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px;background:#f1eaff;border-top:2px ridge white;align-items:center}
+.room-actions button,.owned-actions button{font-size:11px}.owned-actions:empty{display:none}
+.owned-actions button[aria-pressed=true]{background:#fff0bb;outline:2px dashed #9573ac}
+.play-toolbar button{touch-action:none;min-height:40px;min-width:40px}
+#play-sprite img{image-rendering:pixelated;border:2px ridge white}
+.embedded-room body{background:transparent;min-height:0}
+.embedded-room .wrap{padding:0 0 8px;max-width:none}
+.embedded-room .wrap>.bar{font-size:11px;padding:8px}
+.embedded-room .wrap>.bar b,.embedded-room .foot{display:none}
+.embedded-room .window{box-shadow:none;margin-top:10px}
+@media(max-width:680px){#room-scene.phaser-active{height:auto;overflow:hidden}.panel{padding:9px;gap:8px}.room-actions,.owned-actions{padding:8px}.play-toolbar{padding:8px;gap:6px}.play-toolbar small{flex-basis:100%}.shop{grid-template-columns:repeat(2,minmax(0,1fr))}.item{flex-direction:column;align-items:stretch;padding:7px;font-size:11px}.item button{font-size:10px;padding:8px 4px}}
