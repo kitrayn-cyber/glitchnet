@@ -1,5 +1,6 @@
 import {drawRoom} from './art.js';
-import {createWalkingAvatar} from './avatar.js';
+import {createWalkingAvatar} from './avatar.js?v=3';
+import {AvatarAnimation} from './animation.js?v=3';
 import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js';
 
 export function mountRoom(host,options) {
@@ -16,8 +17,8 @@ export function mountRoom(host,options) {
      const wardrobe=this.add.graphics();wardrobe.fillStyle(0xb79ac6);wardrobe.fillRect(395,89,17,43);wardrobe.fillStyle(0xe3c7dc);wardrobe.fillRect(397,91,13,38);wardrobe.fillStyle(0xffe4a5);wardrobe.fillRect(404,111,2,3);
      createWalkingAvatar(this,options.state.avatar);
      this.shadow=this.add.ellipse(0,0,18,5,0x9f85aa,.23).setDepth(5);
-     this.player=this.add.sprite(0,0,'walker').setOrigin(.5,1).setDisplaySize(24,27).setDepth(10);
-     this.decor=new Map();this.sync(options.state.positions,options.state.room.owned);
+     this.player=this.add.sprite(0,0,'walker',0).setOrigin(.5,1).setDepth(10);
+     this.animation=new AvatarAnimation();this.decor=new Map();this.sync(options.state.positions,options.state.room.owned);
      for(const f of furniture)this.add.zone(f.x+f.w/2,f.y+f.h/2,f.w,f.h).setInteractive({useHandCursor:true}).on('pointerdown',pointer=>{
       if(this.mode==='decorate')return;
       pointer.event.stopPropagation();this.target=null;options.action(f.id);this.furnitureClick=true;
@@ -40,7 +41,7 @@ export function mountRoom(host,options) {
      on(window,'pagehide',()=>this.savePosition());
      this.game.events.on('destroy',()=>{this.stop();cleanup.splice(0).forEach(fn=>fn());clearTimeout(timer);});
      ready=true;clearTimeout(timer);
-     resolve({sync:(p,owned)=>this.sync(p,owned),mode:(mode,id)=>{this.mode=mode;this.selected=id;this.stop();},step:(dx,dy)=>{this.target=null;this.moveBy(dx,dy);this.savePosition();},hold:(code,down)=>{this.target=null;if(down)this.held.add(code);else{this.held.delete(code);this.savePosition();}},pause:()=>this.stop(),destroy:()=>game.destroy(true)});
+     resolve({sync:(p,owned)=>this.sync(p,owned),mode:(mode,id)=>{this.mode=mode;this.selected=id;this.stop();},step:(dx,dy)=>{this.target=null;const before={x:this.player.x,y:this.player.y};this.moveBy(dx,dy);const pose=this.animation.update(this.player.x-before.x,this.player.y-before.y,50);this.player.setFrame(pose.frame);this.savePosition();},hold:(code,down)=>{this.target=null;if(down)this.held.add(code);else{this.held.delete(code);this.savePosition();}},pause:()=>this.stop(),destroy:()=>game.destroy(true)});
     }catch(error){clearTimeout(timer);game?.destroy(true);reject(error);}
    }
    sync(positions,owned){
@@ -76,9 +77,11 @@ export function mountRoom(host,options) {
     if(this.mode==='decorate'){dx=0;dy=0;}
     if(!dx&&!dy&&this.target){dx=this.target.x-this.player.x;dy=this.target.y-this.player.y;if(Math.hypot(dx,dy)<2){this.target=null;dx=dy=0;}}
     const length=Math.hypot(dx,dy),distance=Math.min(65*Math.min(delta,50)/1000,this.target?length:Infinity);
-    if(length){const before={x:this.player.x,y:this.player.y};this.moveBy(dx/length*distance,dy/length*distance);this.player.setFlipX(dx<0);if(this.target&&Math.hypot(this.player.x-before.x,this.player.y-before.y)<.01)this.target=null;this.moving=true;}
+    const animationStart={x:this.player.x,y:this.player.y};
+    if(length){const before={x:this.player.x,y:this.player.y};this.moveBy(dx/length*distance,dy/length*distance);if(this.target&&Math.hypot(this.player.x-before.x,this.player.y-before.y)<.01)this.target=null;this.moving=true;}
     else if(this.moving){this.savePosition();this.moving=false;}
-    this.player.setAngle(length&&!matchMedia('(prefers-reduced-motion: reduce)').matches?Math.sin(time/85)*2:0);
+    const pose=this.animation.update(this.player.x-animationStart.x,this.player.y-animationStart.y,delta,matchMedia('(prefers-reduced-motion: reduce)').matches);
+    this.player.setFrame(pose.frame);host.dataset.avatarDirection=pose.direction;host.dataset.avatarFrame=String(pose.frame);host.dataset.avatarWalking=String(pose.walking);
     if(this.mode==='walk'){const near=this.nearest();options.hint(near.d<55?'E · '+near.f.label:'WASD / arrows to walk · E to interact · click the floor to walk');}
    }
   }

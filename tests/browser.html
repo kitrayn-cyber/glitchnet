@@ -5,7 +5,7 @@ const frame=document.getElementById('frame'),results=document.getElementById('re
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const check=(ok,label)=>{const li=document.createElement('li');li.textContent=(ok?'PASS: ':'FAIL: ')+label;li.className=ok?'pass':'fail';results.append(li);if(!ok)throw Error(label);};
 async function waitFor(fn){for(let i=0;i<100;i++){if(fn())return;await sleep(100);}throw Error('Timed out waiting for room');}
-async function open(path){frame.src=path;await new Promise(resolve=>frame.onload=resolve);await waitFor(()=>frame.contentDocument?.getElementById('room-scene')?.dataset.renderer);}
+async function open(path){frame.src=path+(path.includes('?')?'&':'?')+'v=3';await new Promise(resolve=>frame.onload=resolve);await waitFor(()=>frame.contentDocument?.getElementById('room-scene')?.dataset.renderer);}
 const doc=()=>frame.contentDocument;
 const click=text=>[...doc().querySelectorAll('button')].find(b=>b.textContent.includes(text)).click();
 function key(code,type='keydown'){doc().querySelector('canvas').dispatchEvent(new KeyboardEvent(type,{code,key:code,bubbles:true,cancelable:true}));}

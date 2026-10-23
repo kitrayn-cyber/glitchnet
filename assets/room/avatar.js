@@ -1,71 +1,66 @@
-// Avatar Studio's pixel renderer, reused with a transparent background and walking feet.
-// Keep palettes and option ordering compatible with glitchnet-avatar-v1.
-const sets={skin:['#f6d3b7','#e7b48f','#c99266','#9c6347','#684235','#ffdbcb'],hairColor:['#21192e','#5a332b','#a76437','#f5d17a','#ece4ee','#fa9ad3','#86baf2'],shirt:['#e6a4ed','#8195ec','#303b70','#90c6a2','#f7c774','#fefefe','#fb8cae'],background:['#b7c4ff','#b4eef2','#ffd2ed','#f6dc99','#e4d7f7','#8ca4d6'],hairStyle:['Long','Bob','Short','Spiky','Pigtails','Bald'],eyes:['Blue','Brown','Green','Violet','Dark'],outfit:['Sweater','T-shirt','Jacket','Dress'],accessory:['None','Glasses','Bow','Star','Headphones']};
-const eyeColors={Blue:'#5385d4',Brown:'#6e442e',Green:'#428f73',Violet:'#8f65be',Dark:'#29223d'};
-const defaults={skin:0,hairColor:3,shirt:0,background:0,hairStyle:0,eyes:0,outfit:0,accessory:0};
-function draw(ctx,state){
- const S=(key)=>sets[key][state[key]],skin=S('skin'),hair=S('hairColor'),shirt=S('shirt'),bg=S('background'),style=S('hairStyle'),acc=S('accessory');
- const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
- ctx.clearRect(0,0,48,54);
-
-
- // Hair is drawn BEHIND the neck and face. Bob stops at the jaw;
- // long hair extends behind the shoulders rather than covering the shirt.
- if(style==='Long'){
-   p(11,11,26,35,hair);p(8,23,8,25,hair);p(32,23,8,25,hair);
-   p(7,36,8,12,hair);p(33,36,8,12,hair);
- }
- if(style==='Bob'){
-   p(12,10,24,23,hair);p(10,17,8,16,hair);p(30,17,8,16,hair);
-   p(10,30,8,3,hair);p(30,30,8,3,hair);
- }
- if(style==='Pigtails'){
-   p(13,11,22,20,hair);p(6,20,8,18,hair);p(34,20,8,18,hair);
-   p(6,19,8,4,'#fff5');p(34,19,8,4,'#fff5');
- }
- // Body and shoulders, with a dark pixel outline.
- p(6,38,36,10,'#38334d');p(8,36,32,12,shirt);p(12,33,24,10,shirt);
- if(S('outfit')==='Jacket'){p(8,36,9,12,'#484d79');p(31,36,9,12,'#484d79');p(21,36,6,12,'#f7f1ff')}
- if(S('outfit')==='Dress'){p(6,43,36,5,shirt);p(19,38,10,2,'#fff9')}
- if(S('outfit')==='Sweater')p(19,35,10,4,'#ffffff88');
- if(S('outfit')==='T-shirt')p(21,38,6,3,'#fff9');
- // Visible neck goes over the background hair.
- p(20,31,8,7,'#654b50');p(21,31,6,7,skin);
- p(15,15,18,19,'#4a3640');p(16,16,16,17,skin);
- p(13,23,3,7,skin);p(32,23,3,7,skin);
- p(17,30,14,3,skin);
- if(style!=='Bald'){
-   // Crown / fringe and distinct front framing.
-   p(13,9,22,7,hair);p(14,7,18,4,hair);
-   p(12,13,5,13,hair);p(31,12,5,14,hair);
-   if(style==='Short'){p(12,12,5,8,hair);p(31,12,5,7,hair)}
-   if(style==='Spiky'){p(11,5,5,10,hair);p(17,3,5,10,hair);p(26,4,5,11,hair);p(33,7,4,12,hair)}
-   if(style==='Bob'){
-     p(11,21,4,9,hair);p(33,21,4,9,hair);
-     p(11,30,6,3,hair);p(31,30,6,3,hair);
-   }
-   if(style==='Long'){
-     p(10,21,5,17,hair);p(33,21,5,17,hair);
-     p(10,36,3,12,hair);p(35,36,3,12,hair);
-   }
-   p(16,15,7,4,hair);p(23,14,9,3,hair);
- }
- // Eyes and mouth
- const ec=eyeColors[S('eyes')];p(18,23,4,4,'#fff');p(27,23,4,4,'#fff');p(19,24,2,3,ec);p(28,24,2,3,ec);p(19,24,1,1,'#fff');p(28,24,1,1,'#fff');
- p(23,27,2,1,'#cc907f');p(22,30,5,1,'#975765');
- if(acc==='Glasses'){p(16,22,8,6,'#353759');p(25,22,8,6,'#353759');p(18,23,5,4,'#e6edffb5');p(26,23,5,4,'#e6edffb5');p(23,23,3,1,'#353759')}
- if(acc==='Bow'){p(9,11,7,5,'#fe6ea9');p(17,12,3,3,'#ffe9f6');p(20,11,6,5,'#fe6ea9')}
- if(acc==='Star'){p(33,13,3,9,'#ffef86');p(30,16,9,3,'#ffef86');p(32,15,5,5,'#fff1a4')}
- if(acc==='Headphones'){p(12,12,3,18,'#4b5c9f');p(33,12,3,18,'#4b5c9f');p(15,9,18,3,'#4b5c9f');p(11,23,5,8,'#c0cdfb');p(32,23,5,8,'#c0cdfb')}
-
+// Native 24 × 32 pixel frames. Never rotate, stretch or resample the face.
+// Option indices match Avatar Studio and glitchnet-avatar-v1 exactly.
+export const WIDTH=24,HEIGHT=32,FRAMES_PER_DIRECTION=20;
+export const DIRECTIONS=['down','left','right','up'];
+const palettes={skin:['#f6d3b7','#e7b48f','#c99266','#9c6347','#684235','#ffdbcb'],hairColor:['#21192e','#5a332b','#a76437','#f5d17a','#ece4ee','#fa9ad3','#86baf2'],shirt:['#e6a4ed','#8195ec','#303b70','#90c6a2','#f7c774','#fefefe','#fb8cae'],eyes:['#5385d4','#6e442e','#428f73','#8f65be','#29223d']};
+const limits={skin:6,hairColor:7,shirt:7,eyes:5,hairStyle:6,outfit:4,accessory:5,background:6};
+export function normalizeAvatar(saved){const state={skin:0,hairColor:3,shirt:0,eyes:0,hairStyle:0,outfit:0,accessory:0,background:0};for(const key of Object.keys(state))if(Number.isInteger(saved?.[key])&&saved[key]>=0&&saved[key]<limits[key])state[key]=saved[key];return state;}
+// Frames 0..3: normal, breathing, blink, breathing+blink. 4..11: half stride;
+// 12..19: full stride. The same head geometry is drawn for every gait frame.
+export function poseForFrame(frame){
+ if(frame<4)return {swing:0,breath:frame%2,blink:frame>=2};
+ const half=frame<12,phase=(frame-4)%8;
+ return {swing:[0,1,2,1,0,-1,-2,-1][phase]*(half?.5:1),breath:0,blink:false};
 }
-
-export function createWalkingAvatar(scene,saved) {
- const state={...defaults};
- for(const key of Object.keys(defaults))if(Number.isInteger(saved?.[key])&&saved[key]>=0&&saved[key]<sets[key].length)state[key]=saved[key];
- const texture=scene.textures.createCanvas('walker',48,54),ctx=texture.context;
- draw(ctx,state);
- ctx.fillStyle='#796b8d';ctx.fillRect(13,48,8,5);ctx.fillRect(28,48,8,5);
- ctx.fillStyle='#fff1e6';ctx.fillRect(11,52,10,2);ctx.fillRect(28,52,10,2);
- texture.refresh();
+export function drawAvatar(ctx,saved,direction,pose={swing:0,breath:0,blink:false}){
+ const s=normalizeAvatar(saved),skin=palettes.skin[s.skin],hair=palettes.hairColor[s.hairColor],shirt=palettes.shirt[s.shirt],eye=palettes.eyes[s.eyes];
+ const back=direction==='up',side=direction==='left'||direction==='right';
+ ctx.save();ctx.clearRect(0,0,WIDTH,HEIGHT);ctx.imageSmoothingEnabled=false;
+ if(direction==='left'){ctx.translate(WIDTH,0);ctx.scale(-1,1);}
+ const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h);};
+ const swing=Math.round(pose.swing),breath=pose.breath||0;
+ const arm=(x,offset)=>{p(x,18+offset-breath,3,s.outfit===1?3:5,shirt);p(x,23+offset-breath,3,3,skin);};
+ const leg=(x,offset)=>{p(x,25,4,4+Math.max(0,offset),'#796b8d');p(x-1,28+offset,5,2,'#fff1e6');};
+ // Far limbs, then near limbs. The arms oppose the leg on the same side.
+ if(side){leg(9-swing,swing>0?1:0);arm(9+swing,0);leg(12+swing,swing<0?1:0);}
+ else{leg(7,swing);leg(14,-swing);}
+ // Hair behind the body, with distinct silhouettes for all studio styles.
+ if(s.hairStyle===0){p(5,7,14,17,hair);p(4,15,4,11,hair);p(16,15,4,11,hair);}
+ if(s.hairStyle===1)p(5,5,14,13,hair);
+ if(s.hairStyle===4){p(3,9,4,14,hair);p(17,9,4,14,hair);p(3,10,4,2,'#f6d2e8');p(17,10,4,2,'#f6d2e8');}
+ // Torso alone moves by one pixel on an idle inhale. Head and eyes never bob.
+ p(side?8:6,18-breath,side?9:12,8+breath,shirt);
+ if(s.outfit===2){p(side?8:6,18-breath,4,8+breath,'#484d79');p(side?14:14,18-breath,side?3:4,8+breath,'#484d79');p(11,19-breath,3,7+breath,'#f7f1ff');}
+ if(s.outfit===3){p(side?7:5,24,side?11:14,3,shirt);if(!back)p(10,21,5,1,'#fff1e6');}
+ if(s.outfit===0&&!back)p(9,18-breath,6,2,'#f9e9f2');
+ if(s.outfit===1&&!back)p(10,20-breath,4,2,'#f9e9f2');
+ if(side)arm(12-swing,-Math.sign(swing));else{arm(3,-swing);arm(18,swing);}
+ // Fixed neck and head bounding box, identical across idle and walk frames.
+ p(10,15,4,4,skin);p(7,3,10,12,skin);p(6,8,1,4,skin);p(17,8,side?2:1,4,skin);
+ if(s.hairStyle!==5){
+  p(6,2,12,5,hair);p(5,5,3,s.hairStyle===2||s.hairStyle===3?5:10,hair);p(16,5,3,s.hairStyle===2||s.hairStyle===3?5:10,hair);
+  if(s.hairStyle===3){p(5,1,3,4,hair);p(10,0,3,4,hair);p(15,1,3,4,hair);}
+  if(!back){p(8,6,4,2,hair);p(12,5,4,2,hair);}
+  if(back)p(6,5,12,11,hair);
+ }
+ // Opaque, symmetric eye clusters on native integer pixels; no translucent lens overlay.
+ if(!back){
+  const eyes=side?[14]:[8,14];
+  for(const x of eyes){if(pose.blink)p(x,11,2,1,'#51425d');else{p(x,9,2,3,'#fff8f3');p(x+1,10,1,2,eye);p(x+1,9,1,1,'#51425d');}}
+  if(side){p(18,10,1,2,skin);p(15,14,2,1,'#975765');}else p(11,14,2,1,'#975765');
+ }
+ // Accessories remain anchored to the head; rear/side views avoid drawing a second face.
+ if(s.accessory===1&&!back){
+  for(const x of side?[13]:[7,13]){p(x,8,4,1,'#353759');p(x,12,4,1,'#353759');p(x,9,1,3,'#353759');p(x+3,9,1,3,'#353759');}if(!side)p(11,9,2,1,'#353759');
+ }
+ if(s.accessory===2){p(4,3,3,3,'#fe6ea9');p(8,3,3,3,'#fe6ea9');p(7,4,1,1,'#ffe9f6');}
+ if(s.accessory===3){p(18,4,1,5,'#ffef86');p(16,6,5,1,'#ffef86');}
+ if(s.accessory===4){p(5,3,2,10,'#4b5c9f');p(17,3,2,10,'#4b5c9f');p(7,1,10,2,'#4b5c9f');p(4,9,3,5,'#c0cdfb');p(17,9,3,5,'#c0cdfb');}
+ ctx.restore();
+}
+export function createWalkingAvatar(scene,saved){
+ const count=DIRECTIONS.length*FRAMES_PER_DIRECTION,texture=scene.textures.createCanvas('walker',WIDTH*count,HEIGHT),ctx=texture.context;
+ DIRECTIONS.forEach((direction,d)=>{for(let f=0;f<FRAMES_PER_DIRECTION;f++){
+  const index=d*FRAMES_PER_DIRECTION+f;ctx.save();ctx.translate(index*WIDTH,0);drawAvatar(ctx,saved,direction,poseForFrame(f));ctx.restore();texture.add(index,0,index*WIDTH,0,WIDTH,HEIGHT);
+ }});texture.refresh();
 }

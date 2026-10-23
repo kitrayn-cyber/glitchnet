@@ -76,7 +76,7 @@ async function enablePhaser(){
  if(starting)return;starting=true;
  try{
   if(!window.Phaser)throw new Error('Phaser did not load');
-  const {mountRoom}=await import('./engine.js');
+  const {mountRoom}=await import('./engine.js?v=3');
   engine=await mountRoom(host,{storage,state,action,position:savePosition,place,select,status:say,hint:text=>{if(mode==='walk')$('play-hint').textContent=text;}});
   scene.classList.add('phaser-active');scene.dataset.renderer='phaser';$('toggle-renderer').textContent='Use illustrated room';
  }catch(error){host.replaceChildren();host.hidden=true;scene.dataset.renderer='illustrated';$('toggle-renderer').disabled=true;say('The illustrated room is ready. Your shop, saved layout and avatar still work.');console.warn('GlitchNet room fallback:',error.message);}

@@ -6,7 +6,7 @@ This room belongs to GlitchNet. The original standalone prototype is preserved s
 
 - `room.html` retains GlitchNet's beveled windows, decor shop, GlitchCoin counter, navigation, illustrated background, SVG fallback and HTML furniture controls.
 - `home.html` embeds `room.html?embed=1` at the top of its default profile section. A same-origin frame isolates styles and uses the exact same room/shop code. Navigation leaves the frame. The portal, quizzes, games, cat archive, world map, login UI and Avatar Studio remain in place.
-- `assets/room/controller.js` owns purchases, modes, fallback controls and persistence; `engine.js` owns Phaser input/rendering. `geometry.js` contains collision footprints and coordinate conversion. `art.js` contains the prototype artwork. `avatar.js` reuses the Avatar Studio drawing logic with a transparent background and small walking feet.
+- `assets/room/controller.js` owns purchases, modes, fallback controls and persistence; `engine.js` owns Phaser input/rendering. `geometry.js` contains collision footprints and coordinate conversion. `art.js` contains the prototype artwork. `avatar.js` draws native 24 × 32 direction-specific frames using all Avatar Studio options. `animation.js` advances the gait from actual displacement, eases limb motion on start/stop, and selects idle breathing/blinking frames. Head and eye geometry stay fixed; no rotation or half-size portrait resampling is used.
 - Phaser 3.90.0 is vendored, with its MIT license in `assets/vendor/PHASER-LICENSE.md`. There is no build step or runtime CDN requirement for the room. Existing login dependencies are unchanged.
 
 ## Saved data
@@ -38,3 +38,7 @@ node --test tests/room-state.test.mjs
 Open `http://127.0.0.1:8081/tests/browser.html` and click Run browser checks. It runs only on localhost, temporarily seeds legacy saves, and restores this origin's room/avatar data after unloading the test frame. Tests cover movement, collision, E and pointer furniture actions, focus isolation, purchases, placements/reload, mobile width and controls, reset safety, classic fallback, backup, shared Home and existing navigation. No OAuth sign-in is performed by these tests.
 
 Review on the branch before merging. No production publication is required to test these changes.
+
+## Avatar animation verification
+
+`node --test tests/avatar-animation.test.mjs tests/room-state.test.mjs` checks directional facing, diagonal stability, stride progression, idle transitions, breathing/blinking, reduced motion and saved-data compatibility. `tests/animation.html` provides enlarged contact sheets and in-browser pixel comparisons across all directions and 600 hair/outfit/accessory/eye combinations, followed by real room input and idle-cycle checks. It restores the local position save after its run. `tests/browser.html` continues to cover room interactions and purchases.

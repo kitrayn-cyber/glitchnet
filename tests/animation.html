@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>GlitchNet avatar animation QA</title><style>body{font:14px system-ui;background:#eee6f6;color:#51425d;padding:20px}canvas{image-rendering:pixelated;background:#e1d4eb;border:2px solid #b59bc6}#sheet{width:600px;max-width:100%}li{padding:4px}.pass{color:#17603b}.fail{color:#a11}iframe{width:800px;height:800px}button{padding:12px}</style><h1>GlitchNet avatar animation QA</h1><p>Rows: down, left, right, up. Columns: neutral, half-stride, full stride, opposite stride, inhale, blink.</p><canvas id="sheet" width="144" height="128"></canvas><p><button id="run">Run animation checks</button></p><ol id="results"></ol><iframe id="room" title="Animated GlitchNet room"></iframe>
+<script type="module">
+import {drawAvatar,poseForFrame,DIRECTIONS,WIDTH,HEIGHT} from '../assets/room/avatar.js?v=3';
+const sheet=document.getElementById('sheet'),context=sheet.getContext('2d'),results=document.getElementById('results');
+const options={skin:1,hairColor:5,hairStyle:4,eyes:3,outfit:2,accessory:1};
+for(let d=0;d<4;d++)for(let c=0;c<6;c++){context.save();context.translate(c*24,d*32);drawAvatar(context,options,DIRECTIONS[d],poseForFrame([0,6,14,18,1,2][c]));context.restore();}
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+const assert=(ok,text)=>{const li=document.createElement('li');li.className=ok?'pass':'fail';li.textContent=(ok?'PASS: ':'FAIL: ')+text;results.append(li);if(!ok)throw Error(text);};
+const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;const ctx=canvas.getContext('2d',{willReadFrequently:true});
+const pixels=(direction,pose,state=options)=>{drawAvatar(ctx,state,direction,pose);return ctx.getImageData(0,0,24,32).data.slice();};
+const equal=(a,b,start,end)=>{for(let i=start;i<end;i++)if(a[i]!==b[i])return false;return true;};
+const frame=document.getElementById('room');
+document.getElementById('run').onclick=async()=>{
+ results.replaceChildren();
+ const keys=['glitchnet-room-positions-v1','glitchnet-room-backup-v1'],snapshot=Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)]));
+ try{
+  for(const dir of DIRECTIONS){const base=pixels(dir,poseForFrame(0));let stable=true;for(let f=4;f<20;f++)stable&&=equal(base,pixels(dir,poseForFrame(f)),0,24*16*4);assert(stable,dir+': head and eyes remain pixel-identical throughout the gait');assert(!equal(pixels(dir,poseForFrame(14)),pixels(dir,poseForFrame(18)),24*18*4,24*32*4),dir+': alternating arms and legs have distinct poses');}
+  for(let hair=0;hair<6;hair++)for(let outfit=0;outfit<4;outfit++)for(let accessory=0;accessory<5;accessory++)for(let eyes=0;eyes<5;eyes++){
+   const state={...options,hairStyle:hair,outfit,accessory,eyes};const base=pixels('down',poseForFrame(0),state);for(let f=4;f<20;f++)if(!equal(base,pixels('down',poseForFrame(f),state),0,24*16*4))throw Error('Customization changes face during gait');
+  }assert(true,'600 hair/outfit/accessory/eye combinations preserve facial geometry');
+  assert(!equal(pixels('down',poseForFrame(0)),pixels('down',poseForFrame(2)),0,24*16*4),'idle blink closes eyes without a head transform');
+  assert(equal(pixels('down',poseForFrame(0)),pixels('down',poseForFrame(1)),0,24*16*4),'idle breathing keeps the head still');
+  assert(!equal(pixels('down',poseForFrame(0)),pixels('down',poseForFrame(1)),24*16*4,24*32*4),'idle breathing changes only the torso and arms');
+  frame.src='../room.html?v=3';await new Promise(r=>frame.onload=r);for(let n=0;n<100&&!frame.contentDocument.querySelector('#room-scene[data-renderer="phaser"]');n++)await delay(100);
+  const doc=frame.contentDocument,host=doc.querySelector('#phaser-room'),sprite=doc.querySelector('canvas');assert(!!sprite,'Phaser renders native avatar sprite frames');
+  const press=(code,type)=>sprite.dispatchEvent(new KeyboardEvent(type,{code,bubbles:true,cancelable:true}));
+  const dirs=[['KeyD','right'],['KeyA','left'],['KeyW','up'],['KeyS','down']];
+  for(const [key,direction] of dirs){doc.querySelector('#reset-layout').click();sprite.focus();const frames=new Set();press(key,'keydown');for(let n=0;n<10;n++){await delay(25);frames.add(host.dataset.avatarFrame);}press(key,'keyup');await delay(180);assert(host.dataset.avatarDirection===direction&&frames.size>=3,direction+': browser movement advances limb frames and retains facing on stop');assert(host.dataset.avatarWalking==='false',direction+': transition returns to idle');}
+  const idle=new Set();for(let n=0;n<45;n++){await delay(100);idle.add(host.dataset.avatarFrame);}assert(idle.size>=3,'browser idle cycles through breathing and blink frames');
+  assert(true,'Animation browser checks completed');
+ }catch(error){const li=document.createElement('li');li.className='fail';li.textContent='FAIL: '+error.message;results.append(li);}
+ finally{frame.src='about:blank';await new Promise(resolve=>frame.onload=resolve);for(const key of keys){if(snapshot[key]===null)localStorage.removeItem(key);else localStorage.setItem(key,snapshot[key]);}}
+};
+</script></html>
