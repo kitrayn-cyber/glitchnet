@@ -49,6 +49,25 @@ document.getElementById('run').onclick=async()=>{
   check(!doc().getElementById('home').hidden&&!!doc().querySelector('#profile-room'),'home opens with the shared room as the main profile experience');
   doc().querySelector('[data-show="quiz"]').click();check(!doc().getElementById('quiz').hidden&&doc().getElementById('home').hidden,'existing quiz navigation still works');
   check(!!doc().querySelector('a[href="romance.html"]')&&!!doc().querySelector('a[href="map.html"]')&&!!doc().getElementById('glitchnet-auth'),'existing destinations and login UI remain present');
+  // Exercise the existing editor rather than only checking that its JSON survives.
+  const decorBefore=JSON.stringify(JSON.parse(localStorage.getItem(KEYS.positions)).decor);
+  frame.src='../avatar.html';await new Promise(resolve=>frame.onload=resolve);
+  await waitFor(()=>doc().querySelector('#hairColor button'));
+  for(const label of ['hairColor color 7','Pigtails','Green','Dress','Bow']){
+   const option=[...doc().querySelectorAll('button')].find(b=>b.getAttribute('aria-label')===label);if(!option)throw Error('Avatar option missing: '+label);option.click();
+  }
+  doc().getElementById('save').click();
+  const custom=JSON.parse(localStorage.getItem(KEYS.avatar));
+  check(custom.hairColor===6&&custom.hairStyle===4&&custom.eyes===2&&custom.outfit===3&&custom.accessory===2&&localStorage.getItem(KEYS.pfp)?.startsWith('data:image/png;base64,'),'Avatar Studio saves hair, eyes, outfit, accessories and PFP');
+  await open('../room.html');
+  const avatarHost=doc().querySelector('#phaser-room'),avatarCanvas=doc().querySelector('#phaser-room canvas');
+  const head=avatarCanvas.getContext('2d').getImageData(Math.round(+avatarHost.dataset.avatarX)-12,Math.round(+avatarHost.dataset.avatarY)-32,24,16).data;
+  let blueHair=false;for(let i=0;i<head.length;i+=4)if(head[i]===134&&head[i+1]===186&&head[i+2]===242&&head[i+3]===255)blueHair=true;
+  check(blueHair,'room visibly renders newly saved avatar hair color');
+  check(doc().getElementById('coins').textContent.includes('25')&&avatarHost.dataset.owned==='poster,plant,rug'&&JSON.stringify(JSON.parse(localStorage.getItem(KEYS.positions)).decor)===decorBefore,'customization leaves coins, purchased items and saved decoration layout intact');
+  frame.src='../home.html';await new Promise(resolve=>frame.onload=resolve);
+  await waitFor(()=>doc().querySelector('.gn-pfp')?.style.display==='block');
+  check(doc().querySelector('.gn-pfp').getAttribute('src')===localStorage.getItem(KEYS.pfp),'Home profile shows the newly saved PFP');
   check(true,'All browser checks completed');
  }catch(error){const li=document.createElement('li');li.className='fail';li.textContent='STOPPED: '+error.message;results.append(li);console.error(error);}
  finally{
