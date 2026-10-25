@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>GlitchNet room integration checks</title><style>body{font:14px system-ui;background:#eee8fa;color:#352951;padding:20px}button{padding:12px}iframe{display:block;width:960px;max-width:100%;height:850px;border:2px solid #9d8aba;margin-top:15px}li{padding:4px}.pass{color:#17603b}.fail{color:#ad173e}</style><h1>GlitchNet room integration checks</h1><p>Localhost only. Uses temporary fixtures and restores this origin’s saved data after the run.</p><button id="run">Run browser checks</button><ol id="results"></ol><iframe id="frame" title="GlitchNet test room"></iframe>
+<script type="module">
+import {KEYS,defaultPositions} from '../assets/room/state.js';
+const frame=document.getElementById('frame'),results=document.getElementById('results');
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const check=(ok,label)=>{const li=document.createElement('li');li.textContent=(ok?'PASS: ':'FAIL: ')+label;li.className=ok?'pass':'fail';results.append(li);if(!ok)throw Error(label);};
+async function waitFor(fn){for(let i=0;i<100;i++){if(fn())return;await sleep(100);}throw Error('Timed out waiting for room');}
+async function open(path){frame.src=path+(path.includes('?')?'&':'?')+'v=3';await new Promise(resolve=>frame.onload=resolve);await waitFor(()=>frame.contentDocument?.getElementById('room-scene')?.dataset.renderer);}
+const doc=()=>frame.contentDocument;
+const click=text=>[...doc().querySelectorAll('button')].find(b=>b.textContent.includes(text)).click();
+function key(code,type='keydown'){doc().querySelector('canvas').dispatchEvent(new KeyboardEvent(type,{code,key:code,bubbles:true,cancelable:true}));}
+async function walk(code,ms){doc().querySelector('canvas').focus();key(code);await sleep(ms);key(code,'keyup');await sleep(120);}
+function point(x,y){const canvas=doc().querySelector('canvas'),b=canvas.getBoundingClientRect(),opts={bubbles:true,cancelable:true,clientX:b.left+x/480*b.width,clientY:b.top+y/270*b.height,button:0,buttons:1};canvas.dispatchEvent(new MouseEvent('mousedown',opts));canvas.dispatchEvent(new MouseEvent('mouseup',{...opts,buttons:0}));}
+document.getElementById('run').onclick=async()=>{
+ if(!['127.0.0.1','localhost'].includes(location.hostname)){results.textContent='Run this page on localhost, not a published site.';return;}
+ const keys=[...Object.values(KEYS),'glitchnet-room-backup-v1'],before=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
+ const button=document.getElementById('run');button.disabled=true;results.replaceChildren();
+ try{
+  const positions=defaultPositions(),avatar={skin:3,hairColor:5,shirt:4,background:2,hairStyle:4,eyes:3,outfit:2,accessory:4};
+  localStorage.setItem(KEYS.room,JSON.stringify({coins:80,owned:['poster','plant']}));localStorage.setItem(KEYS.positions,JSON.stringify(positions));localStorage.setItem(KEYS.avatar,JSON.stringify(avatar));localStorage.removeItem('glitchnet-room-backup-v1');
+  const raw=localStorage.getItem(KEYS.positions);await open('../room.html');
+  check(doc().getElementById('room-scene').dataset.renderer==='phaser','Phaser starts with a visible avatar and no fallback');
+  check(doc().querySelector('#phaser-room').dataset.owned==='poster,plant'&&doc().getElementById('coins').textContent.includes('80'),'legacy purchases and GlitchCoins load');
+  check(localStorage.getItem(KEYS.positions)===raw,'loading does not rewrite existing positions');
+  await walk('KeyD',350);let saved=JSON.parse(localStorage.getItem(KEYS.positions));check(saved.avatar.x>positions.avatar.x,'WASD moves and saves the avatar');
+  await walk('ArrowLeft',2200);const x=+doc().querySelector('#phaser-room').dataset.avatarX;check(x>=166&&x<190,'arrows stop at bed collision');
+  doc().querySelector('canvas').focus();key('KeyE');key('KeyE','keyup');await sleep(100);check(doc().getElementById('status').textContent.includes('cozy bed'),'E inspects nearby furniture');
+  point(145,85);await sleep(100);check(doc().getElementById('status').textContent.includes('Soft clouds'),'clicking window inspects furniture');
+  // Keyboard on page controls must not control the room or suppress scrolling.
+  doc().getElementById('walk-mode').focus();const oldX=doc().querySelector('#phaser-room').dataset.avatarX;doc().getElementById('walk-mode').dispatchEvent(new KeyboardEvent('keydown',{code:'KeyD',bubbles:true}));await sleep(150);check(doc().querySelector('#phaser-room').dataset.avatarX===oldX,'movement keys are scoped to the focused canvas');
+  const buy=doc().querySelector('[aria-label="Buy Cloud Rug for 55 GlitchCoins"]');buy.click();check(doc().getElementById('coins').textContent.includes('25'),'shop deducts the correct cost');
+  click('Decorate');doc().querySelector('#owned-decor').querySelectorAll('button')[2].click();point(250,215);await sleep(100);const rug=JSON.parse(localStorage.getItem(KEYS.positions)).decor.rug;check(Math.abs(rug.x-52)>1||Math.abs(rug.y-86)>1,'purchased rug can be selected and placed');
+  await open('../room.html');check(doc().getElementById('coins').textContent.includes('25')&&doc().querySelector('#phaser-room').dataset.owned==='poster,plant,rug','purchases and balance survive reload');check(JSON.stringify(JSON.parse(localStorage.getItem(KEYS.positions)).decor.rug)===JSON.stringify(rug),'decoration positions survive reload');
+  check(localStorage.getItem(KEYS.avatar)===JSON.stringify(avatar),'avatar customization is preserved');
+  click('Use illustrated room');check(doc().getElementById('room-scene').dataset.renderer==='illustrated'&&doc().getElementById('room-illustration').naturalWidth>0,'original illustrated design remains available');
+  click('Computer');check(doc().getElementById('status').textContent.includes('GlitchNet computer'),'fallback furniture actions work');
+  const originalX=JSON.parse(localStorage.getItem(KEYS.positions)).avatar.x;doc().getElementById('step-right').click();check(JSON.parse(localStorage.getItem(KEYS.positions)).avatar.x>originalX,'fallback movement saves');
+  click('Use pixel room');frame.style.width='380px';await sleep(200);check(doc().documentElement.scrollWidth<=doc().documentElement.clientWidth,'mobile layout has no horizontal overflow');
+  doc().getElementById('reset-layout').click();const start=+doc().querySelector('#phaser-room').dataset.avatarX;doc().getElementById('step-right').click();check(+doc().querySelector('#phaser-room').dataset.avatarX>start,'mobile directional control moves avatar');
+  const mobile=doc().getElementById('step-right'),mobileStart=+doc().querySelector('#phaser-room').dataset.avatarX;
+  mobile.dispatchEvent(new PointerEvent('pointerdown',{pointerId:42,pointerType:'touch',bubbles:true,cancelable:true}));await sleep(250);mobile.dispatchEvent(new PointerEvent('pointerup',{pointerId:42,pointerType:'touch',bubbles:true}));await sleep(100);
+  const mobileEnd=+doc().querySelector('#phaser-room').dataset.avatarX;check(mobileEnd>mobileStart,'touch press-and-hold moves avatar');await sleep(150);check(+doc().querySelector('#phaser-room').dataset.avatarX===mobileEnd,'touch release stops movement');
+  mobile.dispatchEvent(new PointerEvent('pointerdown',{pointerId:43,pointerType:'touch',bubbles:true,cancelable:true}));await sleep(50);mobile.dispatchEvent(new PointerEvent('pointercancel',{pointerId:43,pointerType:'touch',bubbles:true}));await sleep(100);const cancelled=doc().querySelector('#phaser-room').dataset.avatarX;await sleep(100);check(doc().querySelector('#phaser-room').dataset.avatarX===cancelled,'cancelled touch does not leave movement stuck');
+  check(JSON.parse(localStorage.getItem(KEYS.room)).coins===25&&JSON.parse(localStorage.getItem(KEYS.room)).owned.length===3,'reset positions preserves purchases and coins');
+  check(doc().querySelectorAll('#owned-decor button').length===3,'owned decoration controls remain available on mobile');
+  await open('../room.html?renderer=classic');check(!doc().querySelector('#phaser-room canvas')&&doc().getElementById('room-scene').dataset.renderer==='illustrated','classic mode works without starting Phaser');
+  check(localStorage.getItem('glitchnet-room-backup-v1')!==null,'original room JSON is backed up before edits');
+  frame.style.width='960px';frame.src='../home.html';await new Promise(resolve=>frame.onload=resolve);await waitFor(()=>doc().querySelector('#profile-room')?.contentDocument?.querySelector('#room-scene')?.dataset.renderer==='phaser');
+  check(!doc().getElementById('home').hidden&&!!doc().querySelector('#profile-room'),'home opens with the shared room as the main profile experience');
+  doc().querySelector('[data-show="quiz"]').click();check(!doc().getElementById('quiz').hidden&&doc().getElementById('home').hidden,'existing quiz navigation still works');
+  check(!!doc().querySelector('a[href="romance.html"]')&&!!doc().querySelector('a[href="map.html"]')&&!!doc().getElementById('glitchnet-auth'),'existing destinations and login UI remain present');
+  // Exercise the existing editor rather than only checking that its JSON survives.
+  const decorBefore=JSON.stringify(JSON.parse(localStorage.getItem(KEYS.positions)).decor);
+  frame.src='../avatar.html';await new Promise(resolve=>frame.onload=resolve);
+  await waitFor(()=>doc().querySelector('#hairColor button'));
+  for(const label of ['hairColor color 7','Pigtails','Green','Dress','Bow']){
+   const option=[...doc().querySelectorAll('button')].find(b=>b.getAttribute('aria-label')===label);if(!option)throw Error('Avatar option missing: '+label);option.click();
+  }
+  doc().getElementById('save').click();
+  const custom=JSON.parse(localStorage.getItem(KEYS.avatar));
+  check(custom.hairColor===6&&custom.hairStyle===4&&custom.eyes===2&&custom.outfit===3&&custom.accessory===2&&localStorage.getItem(KEYS.pfp)?.startsWith('data:image/png;base64,'),'Avatar Studio saves hair, eyes, outfit, accessories and PFP');
+  await open('../room.html');
+  const avatarHost=doc().querySelector('#phaser-room'),avatarCanvas=doc().querySelector('#phaser-room canvas');
+  const head=avatarCanvas.getContext('2d').getImageData(Math.round(+avatarHost.dataset.avatarX)-12,Math.round(+avatarHost.dataset.avatarY)-32,24,16).data;
+  let blueHair=false;for(let i=0;i<head.length;i+=4)if(head[i]===134&&head[i+1]===186&&head[i+2]===242&&head[i+3]===255)blueHair=true;
+  check(blueHair,'room visibly renders newly saved avatar hair color');
+  check(doc().getElementById('coins').textContent.includes('25')&&avatarHost.dataset.owned==='poster,plant,rug'&&JSON.stringify(JSON.parse(localStorage.getItem(KEYS.positions)).decor)===decorBefore,'customization leaves coins, purchased items and saved decoration layout intact');
+  frame.src='../home.html';await new Promise(resolve=>frame.onload=resolve);
+  await waitFor(()=>doc().querySelector('.gn-pfp')?.style.display==='block');
+  check(doc().querySelector('.gn-pfp').getAttribute('src')===localStorage.getItem(KEYS.pfp),'Home profile shows the newly saved PFP');
+  check(true,'All browser checks completed');
+ }catch(error){const li=document.createElement('li');li.className='fail';li.textContent='STOPPED: '+error.message;results.append(li);console.error(error);}
+ finally{
+  // Unload listeners before restoring fixtures, so pagehide cannot rewrite the originals.
+  frame.src='about:blank';await new Promise(resolve=>frame.onload=resolve);
+  for(const key of keys){if(before[key]===null)localStorage.removeItem(key);else localStorage.setItem(key,before[key]);}button.disabled=false;
+ }
+};
+</script></html>
