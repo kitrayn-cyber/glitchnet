@@ -1,5 +1,5 @@
 import {KEYS,ITEMS,loadState,write,purchase,defaultPositions,normalizePoint} from './state.js';
-import {ENTRANCE,worldMapUrl,isIllustratedRightWall} from './entrance.js?v=wardrobe-5';
+import {ENTRANCE,worldMapUrl,isIllustratedRightWall} from './entrance.js?v=cozy-7';
 const $=id=>document.getElementById(id);
 let storage;try{storage=window.localStorage;}catch{storage={getItem:()=>null,setItem:()=>{throw new Error('Storage unavailable');}};}
 let state=loadState(storage),engine=null,mode='walk',selection=null;
@@ -48,7 +48,7 @@ function setMode(next,id=null){
 }
 function select(id){if(!state.room.owned.includes(id))return;setMode('decorate',id);say('★ Place '+ITEMS.find(i=>i.id===id).name+' by clicking the room.');}
 function place(id,p){if(!state.room.owned.includes(id))return;state.positions.decor[id]=normalizePoint(p,state.positions.decor[id]);const saved=persist(KEYS.positions,state.positions);setMode('decorate');refresh();if(saved)say('★ Decoration moved! Your layout was saved.');}
-const messages={bed:'Your cozy bed! Rest mode and dreams are coming later. 🌙',computer:'Your GlitchNet computer! A little corner for your profile and creative projects. ☕',pet:'Your future pet corner! More little companions can move in later. 🐾',shelf:'Books, a sleepy cat plushie, and a few favorite little things. ♡',window:'Soft clouds, warm light, and room for a daydream. ✧'};
+const messages={bed:'Your cozy bed! Rest mode and dreams are coming later. 🌙',computer:'Your GlitchNet computer! A little corner for your profile and creative projects. ☕',pet:'Your future pet corner! More little companions can move in later. 🐾',shelf:'Books, a sleepy cat plushie, and a few favorite little things. ♡',window:'Moonlight, twinkling stars, and a little room for a midnight daydream. ✧'};
 function action(id){
  if(id==='wardrobe'||id==='door'){
   engine?.pause();persist(KEYS.positions,state.positions);
@@ -85,7 +85,7 @@ async function enablePhaser(){
  if(starting)return;starting=true;
  try{
   if(!window.Phaser)throw new Error('Phaser did not load');
-  const {mountRoom}=await import('./engine.js?v=wardrobe-5');
+  const {mountRoom}=await import('./engine.js?v=cozy-7');
   // Measure a visible host so Phaser maps pointer coordinates to the canvas correctly.
   scene.classList.add('phaser-active');host.hidden=false;
   engine=await mountRoom(host,{storage,state,action,position:savePosition,place,select,status:say,hint:text=>{if(mode==='walk')$('play-hint').textContent=text;}});

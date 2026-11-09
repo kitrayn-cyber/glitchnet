@@ -1,7 +1,7 @@
-import {drawRoom,drawWardrobe} from './art.js?v=wardrobe-5';
+import {drawRoom,drawWardrobe,drawDecoration} from './art.js?v=cozy-7';
 import {createWalkingAvatar} from './avatar.js?v=3';
 import {AvatarAnimation} from './animation.js?v=3';
-import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=wardrobe-5';
+import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=cozy-7';
 
 export function mountRoom(host,options) {
  return new Promise((resolve,reject)=>{
@@ -48,12 +48,7 @@ export function mountRoom(host,options) {
     const p=safeSpawn(toWorld(positions.avatar));this.player.setPosition(p.x,p.y);this.target=null;
     for(const object of this.decor.values())object.destroy();this.decor.clear();
     for(const id of owned){
-     const p=toWorld(positions.decor[id],true),g=this.add.graphics().setPosition(p.x,p.y).setDepth(id==='rug'?2:6);
-     const rect=(x,y,w,h,c)=>{g.fillStyle(c);g.fillRect(x,y,w,h);};
-     if(id==='poster'){rect(-10,-25,20,25,0x9d82b4);rect(-8,-23,16,21,0xb6d3ea);rect(-1,-20,2,13,0xffedaf);rect(-6,-15,12,3,0xffedaf);}
-     if(id==='plant'){rect(-7,-9,14,9,0xc99fbb);rect(-1,-26,2,18,0x7d9f85);rect(-9,-25,8,6,0x9fc49c);rect(1,-29,8,6,0x8bb58e);}
-     if(id==='rug'){rect(-29,-9,58,18,0xd3a7ca);rect(-26,-7,52,14,0xf4d7e6);rect(-22,-5,44,10,0xd4b5dc);}
-     if(id==='lamp'){rect(-8,-3,16,3,0xa58ab6);rect(-1,-30,2,27,0xa58ab6);rect(-9,-34,18,9,0xffe3a9);rect(-6,-38,12,4,0xffe3a9);}
+     const p=toWorld(positions.decor[id],true),g=drawDecoration(this,id).setPosition(p.x,p.y).setDepth(id==='rug'?2:6);
      g.setInteractive(new Phaser.Geom.Rectangle(id==='rug'?-29:-11,id==='rug'?-9:-38,id==='rug'?58:22,id==='rug'?18:38),Phaser.Geom.Rectangle.Contains).on('pointerdown',()=>{
       if(this.mode==='decorate'){this.furnitureClick=true;options.select(id);}
      });this.decor.set(id,g);
@@ -86,7 +81,7 @@ export function mountRoom(host,options) {
    }
   }
   try{
-   game=new Phaser.Game({type:Phaser.CANVAS,parent:host,width:480,height:270,backgroundColor:'#e8dff0',pixelArt:true,roundPixels:true,input:{keyboard:false},scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:Room});
+   game=new Phaser.Game({type:Phaser.CANVAS,parent:host,width:480,height:270,backgroundColor:'#343348',pixelArt:true,roundPixels:true,input:{keyboard:false},scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:Room});
   }catch(error){clearTimeout(timer);game?.destroy(true);reject(error);}
  });
 }
