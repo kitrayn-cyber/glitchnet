@@ -12,7 +12,7 @@ document.getElementById('run').onclick=async()=>{
   await open(1100);const d=frame.contentDocument,w=frame.contentWindow;
   check(d.querySelector('.village').naturalWidth===1536,'original village illustration loads');
   check(d.querySelectorAll('.spot').length===7,'seven individually interactive landmarks');
-  const routes={mall:'avatar.html',cats:'cats.html',home:'room.html'};
+  const routes={mall:'avatar.html',cats:'cats.html',home:'room.html',lab:'lab.html'};
   for(const [id,path] of Object.entries(routes)){
    const a=d.querySelector('.spot[data-location="'+id+'"]');check(new URL(a.href).pathname.endsWith('/'+path),id+' preserves its route');
   }
@@ -22,15 +22,15 @@ document.getElementById('run').onclick=async()=>{
   check(spots.every(el=>el.getBoundingClientRect().width>=44&&el.getBoundingClientRect().height>=44),'desktop landmarks meet 44px targets');
   function overlap(a,b){return Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1;}
   check(spots.every((a,i)=>spots.slice(i+1).every(b=>!overlap(a.getBoundingClientRect(),b.getBoundingClientRect()))),'desktop building hotspots do not overlap');
-  for(const id of ['academy','lab','arcade','park']){
+  for(const id of ['academy','arcade','park']){
    const b=d.querySelector('.spot[data-location="'+id+'"]');b.click();check(b.tagName==='BUTTON'&&!b.hasAttribute('href')&&d.getElementById('notice').textContent.includes('under construction'),'coming-soon '+id+' stays on map with notice');
   }
   d.querySelector('.spot[data-location="mall"]').focus();check(d.getElementById('journal-name').textContent==='Avatar Mall','keyboard focus updates explorer journal');
   const tip=d.getElementById('tip-mall');check(w.getComputedStyle(tip).display==='block','focused destination shows decorative tooltip');
-  d.querySelector('.spot[data-location="lab"]').click();d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));check(!d.querySelector('.spot[data-active]')&&w.getComputedStyle(tip).display==='none','Escape dismisses active and focused tooltips');
+  d.querySelector('.spot[data-location="academy"]').click();d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));check(!d.querySelector('.spot[data-active]')&&w.getComputedStyle(tip).display==='none','Escape dismisses active and focused tooltips');
   for(const b of d.querySelectorAll('[data-secret]'))b.click();check(d.getElementById('discovery-count').textContent==='2 of 2 secrets found','both environmental discoveries work');
   d.querySelector('[data-secret]').click();check(d.getElementById('discovery-count').textContent==='2 of 2 secrets found','discoveries count once per visit');
-  check(d.querySelectorAll('.directory-grid>a').length===3&&d.querySelectorAll('.directory-grid>button').length===4,'mobile-friendly directory includes every location');
+  check(d.querySelectorAll('.directory-grid>a').length===4&&d.querySelectorAll('.directory-grid>button').length===3,'mobile-friendly directory includes every location');
   for(const width of [390,320]){
    frame.style.width=width+'px';await sleep(250);
    check(d.documentElement.scrollWidth<=d.documentElement.clientWidth,'no horizontal page overflow at '+width+'px');
@@ -39,7 +39,7 @@ document.getElementById('run').onclick=async()=>{
    d.querySelector('.world').scrollIntoView({block:'center',behavior:'instant'});spots.forEach(el=>el.dataset.dismissed='true');
    check(spots.every(el=>{const r=el.querySelector('.sign').getBoundingClientRect();return d.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.spot')===el;}),'signposts receive the correct touch at '+width+'px ('+spots.filter(el=>{const r=el.querySelector('.sign').getBoundingClientRect();return d.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.spot')!==el;}).map(el=>{const r=el.querySelector('.sign').getBoundingClientRect(),hit=d.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return el.dataset.location+':'+hit?.tagName+'.'+hit?.className+'@'+Math.round(r.y);}).join(',')+')');
    const directory=[...d.querySelectorAll('.directory-grid>a,.directory-grid>button')];check(directory.every(el=>el.getBoundingClientRect().height>=44),'directory touch targets at '+width+'px');
-   d.querySelector('.spot[data-location="lab"]').click();check(d.getElementById('notice').textContent.includes("Gura's Lab"),'mobile tap shows coming-soon message at '+width+'px');
+   d.querySelector('.spot[data-location="academy"]').click();check(d.getElementById('notice').textContent.includes('Glitch Academy'),'mobile tap shows coming-soon message at '+width+'px');
   }
   check([...d.querySelectorAll('a[href]')].every(el=>!['','#'].includes(el.getAttribute('href'))),'no broken placeholder destination links');
   const css=await fetch('../assets/map/map.css').then(r=>r.text());check(css.includes('@media(prefers-reduced-motion:reduce)')&&css.includes('animation:none!important'),'reduced-motion overrides all environmental animation');

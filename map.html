@@ -4,7 +4,7 @@
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
  <title>★ GlitchNet World Map ★</title><meta name="description" content="Explore GlitchNet’s illustrated fantasy village: magical schools, curious shops, cozy homes and little discoveries.">
  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1"><link rel="stylesheet" href="assets/map/map.css?v=village-1">
- <script src="assets/map/map.js?v=village-1" defer></script>
+ <script src="assets/map/map.js?v=lab-1" defer></script>
 </head>
 <body>
  <a class="skip" href="#destinations">Skip to destinations</a>
@@ -16,14 +16,14 @@
    <div class="layout">
     <section class="world-window" aria-labelledby="world-title">
      <header class="window-bar"><h2 id="world-title">explore.world <span>· The Glimmering Vale</span></h2><span aria-hidden="true">✧ ▣</span></header>
-     <div class="map-heading"><span class="ribbon">★ YOUR ADVENTURE STARTS HERE ★</span><span class="legend"><i class="open-dot"></i> 3 places open <i class="soon-dot"></i> 4 on the horizon</span></div>
+     <div class="map-heading"><span class="ribbon">★ YOUR ADVENTURE STARTS HERE ★</span><span class="legend"><i class="open-dot"></i> 4 places open <i class="soon-dot"></i> 3 on the horizon</span></div>
      <p class="map-hint" id="map-instructions">Choose a building to explore. Tab through destinations, or use the directory below.</p>
      <div class="world" aria-describedby="map-instructions">
       <img class="village" src="assets/map/glitchnet-village.webp" width="1536" height="1152" alt="An illustrated fantasy village with seven original landmarks: a magical academy on a hill, green-domed lab, colorful mall, star-topped arcade, cat museum, flower-filled cottage and a pet garden. Winding paths and bridges connect them through green hills and turquoise water." fetchpriority="high">
       <div class="atmosphere" aria-hidden="true"><span class="spark s1">✦</span><span class="spark s2">✧</span><span class="spark s3">✦</span><span class="spark s4">✧</span><span class="flower f1">✿</span><span class="flower f2">✿</span><span class="window-glow g1"></span><span class="window-glow g2"></span></div>
       <div class="destinations" id="destinations" aria-label="Village destinations">
        <button class="spot academy" data-location="academy" data-future="Glitch Academy" aria-label="Glitch Academy · Coming Soon" aria-describedby="tip-academy"><span class="sign"><strong>Glitch Academy</strong><small>Coming Soon</small></span><span class="tip" id="tip-academy" role="tooltip"><b>Glitch Academy</b>Spells, starlight and wonderfully strange homework.<em>Coming Soon · Preview this destination</em></span></button>
-       <button class="spot lab" data-location="lab" data-future="Gura's Lab" aria-label="Gura’s Lab · Coming Soon" aria-describedby="tip-lab"><span class="sign"><strong>Gura’s Lab</strong><small>Coming Soon</small></span><span class="tip" id="tip-lab" role="tooltip"><b>Gura’s Lab</b>Curious experiments. Questionable bubbling noises.<em>Coming Soon · Preview this destination</em></span></button>
+       <a class="spot lab" data-location="lab" href="lab.html" aria-label="Gura’s Lab · Chemistry game open" aria-describedby="tip-lab"><span class="sign"><strong>Gura’s Lab</strong><small>Lab Open!</small></span><span class="tip" id="tip-lab" role="tooltip"><b>Gura’s Lab</b>Curious experiments. Questionable bubbling noises.<em>Open · Mix a little science</em></span></a>
        <a class="spot mall" data-location="mall" href="avatar.html" aria-label="Avatar Mall · Avatar Studio Open" aria-describedby="tip-mall"><span class="sign"><strong>Avatar Mall</strong><small>Avatar Studio Open!</small></span><span class="tip" id="tip-mall" role="tooltip"><b>Avatar Mall</b>A fresh look, a new hairstyle, a little main-character magic.<em>Open · Visit Avatar Studio</em></span></a>
        <button class="spot arcade" data-location="arcade" data-future="The Arcade" aria-label="The Arcade · Coming Soon" aria-describedby="tip-arcade"><span class="sign"><strong>The Arcade</strong><small>Coming Soon</small></span><span class="tip" id="tip-arcade" role="tooltip"><b>The Arcade</b>One more round beneath the neon stars.<em>Coming Soon · Preview this destination</em></span></button>
        <a class="spot cats" data-location="cats" href="cats.html" aria-label="Cat Archive / Cat Café · Cat Gallery Open" aria-describedby="tip-cats"><span class="sign"><strong>Cat Archive</strong><small>Cat Café · Gallery Open!</small></span><span class="tip" id="tip-cats" role="tooltip"><b>Cat Archive / Cat Café</b>A tiny museum of internet cats. Every exhibit is purrfect.<em>Open · Visit the Cat Gallery</em></span></a>
@@ -49,11 +49,11 @@
     <a href="cats.html"><span>02</span><div><strong>Cat Archive / Cat Café</strong><small>Cat Gallery · Open</small></div><b aria-hidden="true">↗</b></a>
     <a href="room.html"><span>03</span><div><strong>My Home</strong><small>Your playable pixel room · Open</small></div><b aria-hidden="true">↗</b></a>
     <button data-location="academy" data-future="Glitch Academy"><span>04</span><div><strong>Glitch Academy</strong><small>Magical school · Coming Soon</small></div><b aria-hidden="true">✧</b></button>
-    <button data-location="lab" data-future="Gura's Lab"><span>05</span><div><strong>Gura’s Lab</strong><small>Curious experiments · Coming Soon</small></div><b aria-hidden="true">✧</b></button>
+    <a href="lab.html" data-location="lab"><span>05</span><div><strong>Gura’s Lab</strong><small>Pixel chemistry · Open</small></div><b aria-hidden="true">↗</b></a>
     <button data-location="arcade" data-future="The Arcade"><span>06</span><div><strong>The Arcade</strong><small>Retro games · Coming Soon</small></div><b aria-hidden="true">✧</b></button>
     <button data-location="park" data-future="Pet Park"><span>07</span><div><strong>Pet Park</strong><small>Future pets · Coming Soon</small></div><b aria-hidden="true">✧</b></button>
    </div></section>
-   <p class="explorer-note"><b>✦ EXPLORER’S NOTE ✦</b> Our world is just beginning! Avatar Studio, your homepage, and the Cat Gallery are open. Pet Park is reserved for adopting, brushing and caring for tiny digital pets. The other locations are previews of places still to come.</p>
+   <p class="explorer-note"><b>✦ EXPLORER’S NOTE ✦</b> Our world is just beginning! Avatar Studio, your home, the Cat Gallery, and Gura’s Lab are open. Pet Park is reserved for adopting, brushing and caring for tiny digital pets. The other locations are previews of places still to come.</p>
   </main>
   <footer class="footer"><a href="home.html">← Back to GlitchNet</a><span>★ GLITCHNET · EST. 2026 · THE INTERNET IS YOUR PLAYGROUND ★</span><a href="#main">Back to top ↑</a></footer>
  </div>

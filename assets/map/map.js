@@ -1,7 +1,7 @@
 // Map-only presentation. No account, room, currency or inventory storage is read or written.
 const locations={
  academy:{name:'Glitch Academy',description:'A magical school on the hill, with starlit lessons and wonderfully strange homework.',status:'Coming Soon · This destination is still being built.'},
- lab:{name:'Gura’s Lab',description:'Copper coils, glowing experiments and some very curious bubbling noises.',status:'Coming Soon · This destination is still being built.'},
+ lab:{name:'Gura’s Lab',description:'Mix fictional reagents, discover curious potions, and consult an unimpressed scientist.',status:'Open · The chemistry lab is ready to explore.'},
  mall:{name:'Avatar Mall',description:'Visit Avatar Studio to customize your hair, outfit, accessories and pixel profile picture.',status:'Open · Avatar Studio is ready to explore.'},
  arcade:{name:'The Arcade',description:'A star-bright amusement hall for future games and one-more-round adventures.',status:'Coming Soon · This destination is still being built.'},
  cats:{name:'Cat Archive / Cat Café',description:'The Cat Gallery is open. Come browse a little museum of internet cats.',status:'Open · The Cat Gallery is waiting for you.'},
