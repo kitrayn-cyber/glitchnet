@@ -18,8 +18,12 @@ export function drawRoom(scene){
  r(108,61,12,53,0xd0b9dd);r(111,65,3,45,0xe5cfea);r(174,61,11,53,0xd0b9dd);r(179,65,3,45,0xe5cfea);r(106,58,82,3,0xb59abc);
  // Fairy lights.
  for(let x=192;x<346;x+=11){r(x,62+Math.round(Math.sin((x-192)/150*Math.PI)*9),10,1,0xb7a0b9);star(x+2,64+Math.round(Math.sin((x-192)/150*Math.PI)*9),0xffe6a6)}
- // Door.
- r(350,76,41,86,0xb397b2);r(354,80,33,80,0xd8bccd);r(358,85,25,30,0xc9abbe);r(360,87,21,26,0xe3c7d7);r(358,122,25,31,0xc9abbe);r(360,124,21,27,0xe3c7d7);r(378,119,4,4,0xffe4a5);
+ // The right wall stays continuous wallpaper: the former door is gone.
+ // Open front-left landing and two steps, aligned with the shared exit zone.
+ r(168,230,40,7,0xe8c8bb);r(168,230,40,2,0xffe5e2);
+ r(166,237,44,7,0xd4b1bc);r(166,237,44,2,0xffe4df);
+ r(164,244,48,7,0xbfa4b6);r(164,244,48,2,0xf3d4d5);
+ for(let x=176;x<208;x+=10)r(x,232,1,4,0xd6b3ac);
  // Shelf, books, sleepy cat.
  r(192,108,65,5,0xb296a7);r(195,113,3,6,0xb296a7);r(248,113,3,6,0xb296a7);
  [0xc2aed9,0xe0a8b7,0xf6dba9,0xa9c5cf].forEach((c,i)=>{r(197+i*6,90+i%2*3,5,18-i%2*3,c);r(198+i*6,94+i%2*3,3,1,0xf8eeed)});

@@ -1,11 +1,12 @@
 import {clamp} from './state.js';
+import {ENTRANCE} from './entrance.js?v=single-exit-4';
 export const furniture = [
  {id:'bed',label:'Bed',x:91,y:137,w:70,h:85,solid:true,foot:{x:91,y:147,w:70,h:75}},
  {id:'computer',label:'Computer',x:264,y:119,w:93,h:50,solid:true,foot:{x:264,y:144,w:93,h:28}},
  {id:'shelf',label:'Favorite little things',x:192,y:86,w:65,h:33},
  {id:'window',label:'Window',x:113,y:60,w:69,h:65},
  {id:'wardrobe',label:'Wardrobe',x:395,y:89,w:17,h:43,solid:true,foot:{x:395,y:132,w:17,h:16}},
- {id:'door',label:'World Map',x:350,y:76,w:41,h:86},
+ ENTRANCE,
  {id:'pet',label:'Pet corner',x:328,y:205,w:27,h:20}
 ];
 const blocks=furniture.filter(f=>f.solid).map(f=>f.foot);
