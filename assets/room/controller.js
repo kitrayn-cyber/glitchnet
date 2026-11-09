@@ -77,6 +77,12 @@ for(const [key,value] of Object.entries(ENTRANCE.illustrated))exitHotspot.style[
 exitHotspot.href=worldMapUrl(location.href);
 document.querySelectorAll('[data-action]').forEach(el=>{el.addEventListener('click',event=>{if(el.tagName==='A')event.preventDefault();action(el.dataset.action);});if(el.tagName!=='BUTTON')el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();action(el.dataset.action);}});});
 const art=$('room-illustration');const showArt=()=>{if(art.naturalWidth>0)scene.classList.add('has-art');};art.addEventListener('load',showArt);showArt();
+// Do not expose an older room rendering while the playable Phaser room initializes.
+function revealIllustratedRoom(){
+ const finish=()=>scene.classList.add('room-ready');
+ if(art.complete){showArt();finish();}
+ else{art.addEventListener('load',finish,{once:true});art.addEventListener('error',finish,{once:true});}
+}
 // The old view remains usable with the saved portrait if the game library cannot load.
 try{const pfp=storage.getItem(KEYS.pfp);if(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(pfp||'')){const img=document.createElement('img');img.src=pfp;img.alt='Your saved pixel avatar';img.width=38;img.height=38;$('play-sprite').replaceChildren(img);}}catch{}
 refresh();setMode('walk');
@@ -89,14 +95,14 @@ async function enablePhaser(){
   // Measure a visible host so Phaser maps pointer coordinates to the canvas correctly.
   scene.classList.add('phaser-active');host.hidden=false;
   engine=await mountRoom(host,{storage,state,action,position:savePosition,place,select,status:say,hint:text=>{if(mode==='walk')$('play-hint').textContent=text;}});
-  scene.classList.add('phaser-active');engine.refreshBounds();scene.dataset.renderer='phaser';$('toggle-renderer').textContent='Use illustrated room';
- }catch(error){scene.classList.remove('phaser-active');host.replaceChildren();host.hidden=true;scene.dataset.renderer='illustrated';$('toggle-renderer').disabled=true;say('The illustrated room is ready. Your shop, saved layout and avatar still work.');console.warn('GlitchNet room fallback:',error.message);}
+  scene.classList.add('phaser-active');engine.refreshBounds();scene.dataset.renderer='phaser';$('toggle-renderer').textContent='Use illustrated room';scene.classList.add('room-ready');
+ }catch(error){scene.classList.remove('phaser-active');host.replaceChildren();host.hidden=true;scene.dataset.renderer='illustrated';$('toggle-renderer').disabled=true;say('The illustrated room is ready. Your shop, saved layout and avatar still work.');console.warn('GlitchNet room fallback:',error.message);revealIllustratedRoom();}
 }
 $('toggle-renderer').onclick=()=>{
  if(!engine)return;
  const active=scene.classList.toggle('phaser-active');host.hidden=!active;engine.pause();if(active)engine.refreshBounds();scene.dataset.renderer=active?'phaser':'illustrated';$('toggle-renderer').textContent=active?'Use illustrated room':'Use pixel room';
 };
-if(new URLSearchParams(location.search).get('renderer')!=='classic')enablePhaser();else{$('toggle-renderer').hidden=true;host.hidden=true;scene.dataset.renderer='illustrated';}
+if(new URLSearchParams(location.search).get('renderer')!=='classic')enablePhaser();else{$('toggle-renderer').hidden=true;host.hidden=true;scene.dataset.renderer='illustrated';revealIllustratedRoom();}
 // Keep the embedded home in sync with edits from another GlitchNet tab.
 window.addEventListener('storage',event=>{if(!Object.values(KEYS).includes(event.key))return;location.reload();});
 if(new URLSearchParams(location.search).get('embed')==='1'){
