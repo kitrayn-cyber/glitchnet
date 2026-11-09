@@ -1,5 +1,5 @@
 import {KEYS,ITEMS,loadState,write,purchase,defaultPositions,normalizePoint} from './state.js';
-import {ENTRANCE,worldMapUrl,isIllustratedRightWall} from './entrance.js?v=single-exit-4';
+import {ENTRANCE,worldMapUrl,isIllustratedRightWall} from './entrance.js?v=wardrobe-5';
 const $=id=>document.getElementById(id);
 let storage;try{storage=window.localStorage;}catch{storage={getItem:()=>null,setItem:()=>{throw new Error('Storage unavailable');}};}
 let state=loadState(storage),engine=null,mode='walk',selection=null;
@@ -85,7 +85,7 @@ async function enablePhaser(){
  if(starting)return;starting=true;
  try{
   if(!window.Phaser)throw new Error('Phaser did not load');
-  const {mountRoom}=await import('./engine.js?v=single-exit-4');
+  const {mountRoom}=await import('./engine.js?v=wardrobe-5');
   // Measure a visible host so Phaser maps pointer coordinates to the canvas correctly.
   scene.classList.add('phaser-active');host.hidden=false;
   engine=await mountRoom(host,{storage,state,action,position:savePosition,place,select,status:say,hint:text=>{if(mode==='walk')$('play-hint').textContent=text;}});

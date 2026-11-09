@@ -1,9 +1,10 @@
-// One physical exit, shared by both renderers. Coordinates never enter saved data.
+// One exit per renderer: the large Phaser door and the illustrated front stairs.
+// Coordinates never enter saved data.
 export const MAP_ROUTE='map.html';
 export const ENTRANCE={
- id:'door',label:'Front-left stairs · World Map',
- x:168,y:219,w:40,h:27,
- approach:{x:188,y:224},interactionRadius:18,
+ id:'door',label:'Exit door · World Map',
+ x:350,y:76,w:41,h:86,
+ approach:{x:371,y:164},interactionRadius:32,
  illustrated:{left:22,top:82,width:28,height:17}
 };
 export function worldMapUrl(base){return new URL(MAP_ROUTE,base).href;}

@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {furniture,canStand,move} from '../assets/room/geometry.js';
 import {ENTRANCE,worldMapUrl,isIllustratedRightWall} from '../assets/room/entrance.js';
-test('the only scene exit is the reachable front-left stair landing',()=>{
+test('the only Phaser exit is the reachable large right-wall door',()=>{
  const exits=furniture.filter(f=>f.id==='door');assert.equal(exits.length,1);assert.deepEqual(exits[0],ENTRANCE);
- assert.ok(ENTRANCE.x<240&&ENTRANCE.y>210);assert.ok(canStand(ENTRANCE.approach.x,ENTRANCE.approach.y));
- const arrival=move({x:188,y:210},0,14);assert.deepEqual(arrival,ENTRANCE.approach);
- assert.ok(!furniture.some(f=>f.id==='door'&&f.x>=350));
+ assert.equal(ENTRANCE.x,350);assert.equal(ENTRANCE.w,41);assert.ok(canStand(ENTRANCE.approach.x,ENTRANCE.approach.y));
+ const arrival=move({x:371,y:180},0,-16);assert.deepEqual(arrival,ENTRANCE.approach);
+ assert.equal(furniture.filter(f=>f.id==='wardrobe').length,1);assert.equal(furniture.find(f=>f.id==='wardrobe').w,17);
  assert.equal(canStand(372,120),false,'repaired wall is outside the walking floor');
  assert.equal(canStand(420,160),false,'right boundary remains closed');
 });

@@ -1,7 +1,7 @@
-import {drawRoom} from './art.js?v=single-exit-4';
+import {drawRoom,drawWardrobe} from './art.js?v=wardrobe-5';
 import {createWalkingAvatar} from './avatar.js?v=3';
 import {AvatarAnimation} from './animation.js?v=3';
-import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=single-exit-4';
+import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=wardrobe-5';
 
 export function mountRoom(host,options) {
  return new Promise((resolve,reject)=>{
@@ -14,7 +14,7 @@ export function mountRoom(host,options) {
    create(){
     try {
      drawRoom(this);
-     const wardrobe=this.add.graphics();wardrobe.fillStyle(0xb79ac6);wardrobe.fillRect(395,89,17,43);wardrobe.fillStyle(0xe3c7dc);wardrobe.fillRect(397,91,13,38);wardrobe.fillStyle(0xffe4a5);wardrobe.fillRect(404,111,2,3);
+     drawWardrobe(this);
      createWalkingAvatar(this,options.state.avatar);
      this.shadow=this.add.ellipse(0,0,18,5,0x9f85aa,.23).setDepth(5);
      this.player=this.add.sprite(0,0,'walker',0).setOrigin(.5,1).setDepth(10);

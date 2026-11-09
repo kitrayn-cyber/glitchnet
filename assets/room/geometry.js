@@ -1,5 +1,5 @@
 import {clamp} from './state.js';
-import {ENTRANCE} from './entrance.js?v=single-exit-4';
+import {ENTRANCE} from './entrance.js?v=wardrobe-5';
 export const furniture = [
  {id:'bed',label:'Bed',x:91,y:137,w:70,h:85,solid:true,foot:{x:91,y:147,w:70,h:75}},
  {id:'computer',label:'Computer',x:264,y:119,w:93,h:50,solid:true,foot:{x:264,y:144,w:93,h:28}},
