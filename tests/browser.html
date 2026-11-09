@@ -10,7 +10,7 @@ const doc=()=>frame.contentDocument;
 const click=text=>[...doc().querySelectorAll('button')].find(b=>b.textContent.includes(text)).click();
 function key(code,type='keydown'){doc().querySelector('canvas').dispatchEvent(new KeyboardEvent(type,{code,key:code,bubbles:true,cancelable:true}));}
 async function walk(code,ms){doc().querySelector('canvas').focus();key(code);await sleep(ms);key(code,'keyup');await sleep(120);}
-function point(x,y){const canvas=doc().querySelector('canvas'),b=canvas.getBoundingClientRect(),opts={bubbles:true,cancelable:true,clientX:b.left+x/480*b.width,clientY:b.top+y/270*b.height,button:0,buttons:1};canvas.dispatchEvent(new MouseEvent('mousedown',opts));canvas.dispatchEvent(new MouseEvent('mouseup',{...opts,buttons:0}));}
+function point(x,y){const canvas=doc().querySelector('canvas'),b=canvas.getBoundingClientRect(),view=doc().getElementById('phaser-room').dataset,opts={bubbles:true,cancelable:true,clientX:b.left+(x-Number(view.viewLeft))/Number(view.viewWidth)*b.width,clientY:b.top+(y-Number(view.viewTop))/Number(view.viewHeight)*b.height,button:0,buttons:1};canvas.dispatchEvent(new MouseEvent('mousedown',opts));canvas.dispatchEvent(new MouseEvent('mouseup',{...opts,buttons:0}));}
 document.getElementById('run').onclick=async()=>{
  if(!['127.0.0.1','localhost'].includes(location.hostname)){results.textContent='Run this page on localhost, not a published site.';return;}
  const keys=[...Object.values(KEYS),'glitchnet-room-backup-v1'],before=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
@@ -47,6 +47,20 @@ document.getElementById('run').onclick=async()=>{
   check(localStorage.getItem('glitchnet-room-backup-v1')!==null,'original room JSON is backed up before edits');
   frame.style.width='960px';frame.src='../home.html';await new Promise(resolve=>frame.onload=resolve);await waitFor(()=>doc().querySelector('#profile-room')?.contentDocument?.querySelector('#room-scene')?.dataset.renderer==='phaser');
   check(!doc().getElementById('home').hidden&&!!doc().querySelector('#profile-room'),'home opens with the shared room as the main profile experience');
+  // Assert the painted room's scale inside Home, not just the iframe width.
+  async function checkHomeSize(width){
+   frame.style.width=width+'px';await sleep(400);
+   const embed=doc().querySelector('#profile-room'),rd=embed.contentDocument,canvas=rd.querySelector('canvas'),r=canvas.getBoundingClientRect(),view=rd.getElementById('phaser-room').dataset;
+   const panel=embed.closest('.window').getBoundingClientRect();
+   const paintedRatio=358/Number(view.viewWidth)*r.width/panel.width;
+   check(paintedRatio>=.90&&paintedRatio<=.95,'painted dollhouse fills 90–95% of Home panel at '+width+'px');
+   check(Math.abs(r.width/r.height-16/9)<.01,'room preserves 16:9 aspect at '+width+'px');
+   check(rd.querySelector('.play-toolbar').getBoundingClientRect().top>=r.bottom-1&&rd.querySelector('.room-actions').getBoundingClientRect().top>=r.bottom,'controls and furniture buttons stay underneath at '+width+'px');
+   check(rd.defaultView.getComputedStyle(canvas).imageRendering==='pixelated','canvas keeps sharp pixel scaling at '+width+'px');
+   check(rd.documentElement.scrollWidth<=rd.documentElement.clientWidth,'embedded room has no horizontal overflow at '+width+'px');
+   check(Math.abs(embed.getBoundingClientRect().height-rd.body.getBoundingClientRect().height)<4,'Home iframe tracks resized room height at '+width+'px');
+  }
+  await checkHomeSize(960);await checkHomeSize(380);await checkHomeSize(320);frame.style.width='960px';await sleep(250);
   doc().querySelector('[data-show="quiz"]').click();check(!doc().getElementById('quiz').hidden&&doc().getElementById('home').hidden,'existing quiz navigation still works');
   check(!!doc().querySelector('a[href="romance.html"]')&&!!doc().querySelector('a[href="map.html"]')&&!!doc().getElementById('glitchnet-auth'),'existing destinations and login UI remain present');
   // Exercise the existing editor rather than only checking that its JSON survives.

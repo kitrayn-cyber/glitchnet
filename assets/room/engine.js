@@ -1,7 +1,8 @@
-import {drawRoom,drawWardrobe,drawDecoration} from './art.js?v=cozy-7';
+import {GAME_SIZE,roomFrame,decorationBounds} from './framing.js?v=room-size-10';
+import {drawRoom,drawWardrobe,drawDecoration} from './art.js?v=room-size-10';
 import {createWalkingAvatar} from './avatar.js?v=3';
 import {AvatarAnimation} from './animation.js?v=3';
-import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=cozy-7';
+import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=room-size-10';
 
 export function mountRoom(host,options) {
  return new Promise((resolve,reject)=>{
@@ -27,7 +28,8 @@ export function mountRoom(host,options) {
       this.game.canvas.focus({preventScroll:true});
       // Phaser's gameobject event runs before the scene pointer event.
       if(this.furnitureClick){this.furnitureClick=false;return;}
-      const p={x:pointer.x,y:pointer.y};
+      // Camera framing enlarges the entire room; convert screen clicks back to saved world space.
+      const p=this.cameras.main.getWorldPoint(pointer.x,pointer.y);
       if(this.mode==='decorate'){
        if(this.selected)options.place(this.selected,toPercent(p,true));else options.status('Select an owned decoration below, then click the room to place it.');
       } else this.target=safeSpawn(p);
@@ -53,6 +55,10 @@ export function mountRoom(host,options) {
       if(this.mode==='decorate'){this.furnitureClick=true;options.select(id);}
      });this.decor.set(id,g);
     }
+    const view=roomFrame([...this.decor].map(([id,object])=>decorationBounds(id,object)));
+    this.cameras.main.setZoom(view.zoom).centerOn(view.left+view.width/2,view.top+view.height/2);
+    host.dataset.viewLeft=String(view.left);host.dataset.viewTop=String(view.top);
+    host.dataset.viewWidth=String(view.width);host.dataset.viewHeight=String(view.height);
     this.lastSaved=JSON.stringify(toPercent(this.player));this.refreshDOM();
    }
    moveBy(dx,dy){const p=move({x:this.player.x,y:this.player.y},dx,dy);this.player.setPosition(p.x,p.y);this.refreshDOM();}
@@ -81,7 +87,7 @@ export function mountRoom(host,options) {
    }
   }
   try{
-   game=new Phaser.Game({type:Phaser.CANVAS,parent:host,width:480,height:270,backgroundColor:'#343348',pixelArt:true,roundPixels:true,input:{keyboard:false},scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:Room});
+   game=new Phaser.Game({type:Phaser.CANVAS,parent:host,width:GAME_SIZE.width,height:GAME_SIZE.height,backgroundColor:'#343348',pixelArt:true,roundPixels:true,input:{keyboard:false},scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:Room});
   }catch(error){clearTimeout(timer);game?.destroy(true);reject(error);}
  });
 }
