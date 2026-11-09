@@ -16,3 +16,7 @@
 .embedded-room .wrap>.bar b,.embedded-room .foot{display:none}
 .embedded-room .window{box-shadow:none;margin-top:10px}
 @media(max-width:680px){#room-scene.phaser-active{height:auto;overflow:hidden}.panel{padding:9px;gap:8px}.room-actions,.owned-actions{padding:8px}.play-toolbar{padding:8px;gap:6px}.play-toolbar small{flex-basis:100%}.shop{grid-template-columns:repeat(2,minmax(0,1fr))}.item{flex-direction:column;align-items:stretch;padding:7px;font-size:11px}.item button{font-size:10px;padding:8px 4px}}
+
+/* The sole illustrated entrance follows the existing front-left stair landing. */
+#room-scene .art-hotspots #front-left-exit{position:absolute;pointer-events:auto;display:block;padding:0;border:2px solid transparent;background:transparent;color:transparent;clip-path:polygon(0 32%,56% 0,100% 38%,77% 100%,0 72%);cursor:pointer}
+#room-scene .art-hotspots #front-left-exit:hover,#room-scene .art-hotspots #front-left-exit:focus-visible{background:#ffe8ff35;outline:2px dashed white;outline-offset:-4px;border-color:#fff}

@@ -18,7 +18,7 @@ export function drawRoom(scene){
  r(108,61,12,53,0xd0b9dd);r(111,65,3,45,0xe5cfea);r(174,61,11,53,0xd0b9dd);r(179,65,3,45,0xe5cfea);r(106,58,82,3,0xb59abc);
  // Fairy lights.
  for(let x=192;x<346;x+=11){r(x,62+Math.round(Math.sin((x-192)/150*Math.PI)*9),10,1,0xb7a0b9);star(x+2,64+Math.round(Math.sin((x-192)/150*Math.PI)*9),0xffe6a6)}
- // Door.
+ // The large paneled door is the single Phaser exit to the World Map.
  r(350,76,41,86,0xb397b2);r(354,80,33,80,0xd8bccd);r(358,85,25,30,0xc9abbe);r(360,87,21,26,0xe3c7d7);r(358,122,25,31,0xc9abbe);r(360,124,21,27,0xe3c7d7);r(378,119,4,4,0xffe4a5);
  // Shelf, books, sleepy cat.
  r(192,108,65,5,0xb296a7);r(195,113,3,6,0xb296a7);r(248,113,3,6,0xb296a7);
@@ -49,5 +49,24 @@ export function drawRoom(scene){
  r(329,210,25,14,0xb7c8d6);r(331,205,6,10,0xb7c8d6);r(346,205,6,10,0xb7c8d6);r(333,214,4,2,0x8a8aab);r(346,214,4,2,0x8a8aab);r(340,219,3,2,0xe4b8c9);
  // Loose wall decor.
  star(206,131,0xe3b675);star(231,123,0xc3a5ca);
+ return g;
+}
+
+// Open furniture silhouette: visible rail, clothes, drawers and short feet.
+// Keep the original 17 × 43 footprint so existing movement paths stay valid.
+export function drawWardrobe(scene){
+ const g=scene.add.graphics();
+ const r=(x,y,w,h,c)=>{g.fillStyle(c);g.fillRect(x,y,w,h);};
+ r(395,89,17,41,0xb79ac6);r(397,92,13,24,0x8f7caa);
+ r(394,87,19,3,0xe3c7dc);r(397,94,13,1,0xffe4a5);
+ // Two tiny hangers and distinct pastel garments in the open compartment.
+ r(400,95,1,2,0xffe4a5);r(398,97,5,1,0xffe4a5);
+ r(398,98,5,10,0xe8a9c2);r(397,99,1,3,0xe8a9c2);r(403,99,1,3,0xe8a9c2);r(400,98,1,8,0xf6cee0);
+ r(406,95,1,2,0xffe4a5);r(405,97,4,1,0xffe4a5);
+ r(405,98,4,13,0xaacfe0);r(404,99,1,3,0xaacfe0);r(409,99,1,3,0xaacfe0);r(406,99,1,10,0xcfe5ed);
+ r(397,114,13,2,0xe3c7dc);
+ // Two broad drawer fronts, centered pulls, and space beneath the cabinet.
+ for(const y of [117,123]){r(397,y,13,5,0xe3c7dc);r(398,y,11,1,0xf7dde8);r(402,y+2,4,1,0xa486b2);}
+ r(397,130,3,2,0x967ca8);r(407,130,3,2,0x967ca8);
  return g;
 }

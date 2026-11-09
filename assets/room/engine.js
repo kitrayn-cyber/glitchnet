@@ -1,7 +1,7 @@
-import {drawRoom} from './art.js';
+import {drawRoom,drawWardrobe} from './art.js?v=wardrobe-5';
 import {createWalkingAvatar} from './avatar.js?v=3';
 import {AvatarAnimation} from './animation.js?v=3';
-import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js';
+import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=wardrobe-5';
 
 export function mountRoom(host,options) {
  return new Promise((resolve,reject)=>{
@@ -14,7 +14,7 @@ export function mountRoom(host,options) {
    create(){
     try {
      drawRoom(this);
-     const wardrobe=this.add.graphics();wardrobe.fillStyle(0xb79ac6);wardrobe.fillRect(395,89,17,43);wardrobe.fillStyle(0xe3c7dc);wardrobe.fillRect(397,91,13,38);wardrobe.fillStyle(0xffe4a5);wardrobe.fillRect(404,111,2,3);
+     drawWardrobe(this);
      createWalkingAvatar(this,options.state.avatar);
      this.shadow=this.add.ellipse(0,0,18,5,0x9f85aa,.23).setDepth(5);
      this.player=this.add.sprite(0,0,'walker',0).setOrigin(.5,1).setDepth(10);
@@ -41,7 +41,7 @@ export function mountRoom(host,options) {
      on(window,'pagehide',()=>this.savePosition());
      this.game.events.on('destroy',()=>{this.stop();cleanup.splice(0).forEach(fn=>fn());clearTimeout(timer);});
      ready=true;clearTimeout(timer);
-     resolve({sync:(p,owned)=>this.sync(p,owned),mode:(mode,id)=>{this.mode=mode;this.selected=id;this.stop();},step:(dx,dy)=>{this.target=null;const before={x:this.player.x,y:this.player.y};this.moveBy(dx,dy);const pose=this.animation.update(this.player.x-before.x,this.player.y-before.y,50);this.player.setFrame(pose.frame);this.savePosition();},hold:(code,down)=>{this.target=null;if(down)this.held.add(code);else{this.held.delete(code);this.savePosition();}},pause:()=>this.stop(),destroy:()=>game.destroy(true)});
+     resolve({refreshBounds:()=>this.scale.refresh(),sync:(p,owned)=>this.sync(p,owned),mode:(mode,id)=>{this.mode=mode;this.selected=id;this.stop();},step:(dx,dy)=>{this.target=null;const before={x:this.player.x,y:this.player.y};this.moveBy(dx,dy);const pose=this.animation.update(this.player.x-before.x,this.player.y-before.y,50);this.player.setFrame(pose.frame);this.savePosition();},hold:(code,down)=>{this.target=null;if(down)this.held.add(code);else{this.held.delete(code);this.savePosition();}},pause:()=>this.stop(),destroy:()=>game.destroy(true)});
     }catch(error){clearTimeout(timer);game?.destroy(true);reject(error);}
    }
    sync(positions,owned){
@@ -68,7 +68,7 @@ export function mountRoom(host,options) {
    }
    savePosition(){if(!this.player)return;const p=toPercent(this.player);const key=JSON.stringify(p);if(key!==this.lastSaved){this.lastSaved=key;options.position(p);}}
    stop(){this.held.clear();this.target=null;this.savePosition();}
-   nearest(){return furniture.map(f=>({f,d:Phaser.Math.Distance.Between(this.player.x,this.player.y,f.x+f.w/2,f.y+f.h)})).sort((a,b)=>a.d-b.d)[0];}
+   nearest(){return furniture.map(f=>({f,d:Phaser.Math.Distance.Between(this.player.x,this.player.y,f.approach?.x??f.x+f.w/2,f.approach?.y??f.y+f.h)})).filter(item=>!item.f.interactionRadius||item.d<=item.f.interactionRadius).sort((a,b)=>a.d-b.d)[0];}
    interact(){const near=this.nearest();if(near.d<55)options.action(near.f.id);else options.status('Walk closer to furniture, or use the buttons below the room.');}
    update(time,delta){
     if(!ready||host.hidden||document.hidden)return;
