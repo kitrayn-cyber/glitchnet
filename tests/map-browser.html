@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GlitchNet map checks</title><style>body{font:14px/1.6 Verdana,sans-serif;background:#fff8e7;color:#554366}iframe{display:block;width:1100px;max-width:100%;height:900px;border:2px solid #aa8baa}li{padding:3px}.fail{color:#a42d53}.pass{color:#397d61}</style><h1>GlitchNet illustrated map checks</h1><p>Localhost only. No player data is read, seeded, or changed.</p><button id="run">Run map checks</button><button id="mobile">Show mobile preview</button><ol id="results"></ol><iframe id="frame" title="Actual GlitchNet world map"></iframe><script>
+const frame=document.getElementById('frame'),results=document.getElementById('results');
+const local=['localhost','127.0.0.1'].includes(location.hostname);
+if(!local){document.getElementById('run').disabled=true;document.getElementById('mobile').disabled=true;}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const check=(ok,name)=>{const li=document.createElement('li');li.className=ok?'pass':'fail';li.textContent=(ok?'PASS: ':'FAIL: ')+name;results.append(li);if(!ok)throw Error(name);};
+const open=async width=>{frame.style.width=width+'px';frame.src='../map.html?check='+width;await new Promise(r=>frame.onload=r);const image=frame.contentDocument.querySelector('.village');if(!image.complete)await new Promise(r=>{image.onload=r;image.onerror=r;});};
+document.getElementById('mobile').onclick=()=>open(390);
+document.getElementById('run').onclick=async()=>{
+ if(!local)return;results.replaceChildren();document.getElementById('run').disabled=true;
+ try{
+  await open(1100);const d=frame.contentDocument,w=frame.contentWindow;
+  check(d.querySelector('.village').naturalWidth===1536,'original village illustration loads');
+  check(d.querySelectorAll('.spot').length===7,'seven individually interactive landmarks');
+  const routes={mall:'avatar.html',cats:'cats.html',home:'room.html'};
+  for(const [id,path] of Object.entries(routes)){
+   const a=d.querySelector('.spot[data-location="'+id+'"]');check(new URL(a.href).pathname.endsWith('/'+path),id+' preserves its route');
+  }
+  check(d.querySelector('.tabs a[href="home.html"]')&&d.querySelector('.brand a[href="home.html"]'),'homepage navigation remains available');
+  const spots=[...d.querySelectorAll('.spot')];
+  check(spots.every(el=>['A','BUTTON'].includes(el.tagName)&&el.tabIndex===0&&d.getElementById(el.getAttribute('aria-describedby'))),'landmarks are native keyboard controls with descriptions');
+  check(spots.every(el=>el.getBoundingClientRect().width>=44&&el.getBoundingClientRect().height>=44),'desktop landmarks meet 44px targets');
+  function overlap(a,b){return Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1;}
+  check(spots.every((a,i)=>spots.slice(i+1).every(b=>!overlap(a.getBoundingClientRect(),b.getBoundingClientRect()))),'desktop building hotspots do not overlap');
+  for(const id of ['academy','lab','arcade','park']){
+   const b=d.querySelector('.spot[data-location="'+id+'"]');b.click();check(b.tagName==='BUTTON'&&!b.hasAttribute('href')&&d.getElementById('notice').textContent.includes('under construction'),'coming-soon '+id+' stays on map with notice');
+  }
+  d.querySelector('.spot[data-location="mall"]').focus();check(d.getElementById('journal-name').textContent==='Avatar Mall','keyboard focus updates explorer journal');
+  const tip=d.getElementById('tip-mall');check(w.getComputedStyle(tip).display==='block','focused destination shows decorative tooltip');
+  d.querySelector('.spot[data-location="lab"]').click();d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));check(!d.querySelector('.spot[data-active]')&&w.getComputedStyle(tip).display==='none','Escape dismisses active and focused tooltips');
+  for(const b of d.querySelectorAll('[data-secret]'))b.click();check(d.getElementById('discovery-count').textContent==='2 of 2 secrets found','both environmental discoveries work');
+  d.querySelector('[data-secret]').click();check(d.getElementById('discovery-count').textContent==='2 of 2 secrets found','discoveries count once per visit');
+  check(d.querySelectorAll('.directory-grid>a').length===3&&d.querySelectorAll('.directory-grid>button').length===4,'mobile-friendly directory includes every location');
+  for(const width of [390,320]){
+   frame.style.width=width+'px';await sleep(250);
+   check(d.documentElement.scrollWidth<=d.documentElement.clientWidth,'no horizontal page overflow at '+width+'px');
+   check(spots.every(el=>el.getBoundingClientRect().width>=44&&el.getBoundingClientRect().height>=44),'touch landmark targets at '+width+'px');
+   check(spots.every((a,i)=>spots.slice(i+1).every(b=>!overlap(a.getBoundingClientRect(),b.getBoundingClientRect()))),'touch building hotspots do not overlap at '+width+'px');
+   d.querySelector('.world').scrollIntoView({block:'center',behavior:'instant'});spots.forEach(el=>el.dataset.dismissed='true');
+   check(spots.every(el=>{const r=el.querySelector('.sign').getBoundingClientRect();return d.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.spot')===el;}),'signposts receive the correct touch at '+width+'px ('+spots.filter(el=>{const r=el.querySelector('.sign').getBoundingClientRect();return d.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.spot')!==el;}).map(el=>{const r=el.querySelector('.sign').getBoundingClientRect(),hit=d.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return el.dataset.location+':'+hit?.tagName+'.'+hit?.className+'@'+Math.round(r.y);}).join(',')+')');
+   const directory=[...d.querySelectorAll('.directory-grid>a,.directory-grid>button')];check(directory.every(el=>el.getBoundingClientRect().height>=44),'directory touch targets at '+width+'px');
+   d.querySelector('.spot[data-location="lab"]').click();check(d.getElementById('notice').textContent.includes("Gura's Lab"),'mobile tap shows coming-soon message at '+width+'px');
+  }
+  check([...d.querySelectorAll('a[href]')].every(el=>!['','#'].includes(el.getAttribute('href'))),'no broken placeholder destination links');
+  const css=await fetch('../assets/map/map.css').then(r=>r.text());check(css.includes('@media(prefers-reduced-motion:reduce)')&&css.includes('animation:none!important'),'reduced-motion overrides all environmental animation');
+  const js=await fetch('../assets/map/map.js').then(r=>r.text());check(!/localStorage|sessionStorage/.test(js),'map does not touch player storage');
+  check(true,'All map checks completed');
+ }catch(e){check(false,'STOPPED: '+e.message);}finally{document.getElementById('run').disabled=false;}
+};
+</script></html>
