@@ -25,7 +25,7 @@ document.getElementById('run').onclick=async()=>{
   await walk('KeyD',350);let saved=JSON.parse(localStorage.getItem(KEYS.positions));check(saved.avatar.x>positions.avatar.x,'WASD moves and saves the avatar');
   await walk('ArrowLeft',2200);const x=+doc().querySelector('#phaser-room').dataset.avatarX;check(x>=166&&x<190,'arrows stop at bed collision');
   doc().querySelector('canvas').focus();key('KeyE');key('KeyE','keyup');await sleep(100);check(doc().getElementById('status').textContent.includes('cozy bed'),'E inspects nearby furniture');
-  point(145,85);await sleep(100);check(doc().getElementById('status').textContent.includes('Soft clouds'),'clicking window inspects furniture');
+  point(145,85);await sleep(100);check(doc().getElementById('status').textContent.includes('Moonlight'),'clicking window inspects furniture');
   // Keyboard on page controls must not control the room or suppress scrolling.
   doc().getElementById('walk-mode').focus();const oldX=doc().querySelector('#phaser-room').dataset.avatarX;doc().getElementById('walk-mode').dispatchEvent(new KeyboardEvent('keydown',{code:'KeyD',bubbles:true}));await sleep(150);check(doc().querySelector('#phaser-room').dataset.avatarX===oldX,'movement keys are scoped to the focused canvas');
   const buy=doc().querySelector('[aria-label="Buy Cloud Rug for 55 GlitchCoins"]');buy.click();check(doc().getElementById('coins').textContent.includes('25'),'shop deducts the correct cost');
