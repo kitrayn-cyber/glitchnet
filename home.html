@@ -265,7 +265,7 @@
   <div class="window profile-window">
     <div class="window-bar"><span>★ player.profile</span><span>● ONLINE</span></div>
     <div class="profile-body">
-      <div class="portrait"><canvas id="animated-profile" width="48" height="48" role="img" aria-label="Your saved animated pixel avatar" hidden></canvas><img class="gn-pfp" alt="Your saved pixel avatar" width="128" height="128" hidden><div class="portrait-empty">☻<small>NO AVATAR YET</small></div></div>
+      <div class="portrait"><canvas id="animated-profile" width="320" height="320" role="img" aria-label="Your saved animated pixel avatar" hidden></canvas><img class="gn-pfp" alt="Your saved pixel avatar" width="128" height="128" hidden><div class="portrait-empty">☻<small>NO AVATAR YET</small></div></div>
       <div class="profile-copy"><span class="eyebrow">✦ YOUR LITTLE CORNER OF THE INTERNET</span><h2 id="profile-name">glitchkitten</h2><p class="profile-status">“<span id="profile-status">Ready to explore!</span>”</p><button class="small-action" id="edit-profile" type="button">✎ EDIT PROFILE</button>
         <form id="profile-form" hidden><label>Username <input id="name-input" maxlength="32" required></label><label>Status <input id="status-input" maxlength="100"></label><button type="submit">SAVE</button><button type="button" id="cancel-profile">CANCEL</button><p id="profile-message" role="status"></p></form>
       </div>
@@ -502,7 +502,7 @@ form.addEventListener('submit',event=>{event.preventDefault();const name=byId('n
 window.addEventListener('storage',render);window.addEventListener('focus',render);render();
 </script>
 <script type="module">
-import {createPortraitAnimator} from './assets/avatar/portrait.js?v=1';
+import {createPortraitAnimator} from './assets/avatar/portrait.js?v=2';
 const canvas=document.getElementById('animated-profile'),image=document.querySelector('.profile-window .gn-pfp'),empty=document.querySelector('.portrait-empty');
 let current=null,animator=null;
 function updatePortrait(){
