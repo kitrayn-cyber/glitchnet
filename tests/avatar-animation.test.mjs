@@ -16,7 +16,7 @@ test('stride progresses with distance, eases in/out and preserves facing while i
  assert.equal(a.blend,0);assert.equal(a.direction,'right');
 });
 test('idle breathes and blinks; reduced motion holds a neutral frame',()=>{
- const a=new AvatarAnimation(),idle=new Set();for(let n=0;n<300;n++)idle.add(a.update(0,0,16).frame);
+ const a=new AvatarAnimation(),idle=new Set();a.nextBlink=1000;for(let n=0;n<300;n++)idle.add(a.update(0,0,16).frame);
  assert.ok(idle.has(0)&&idle.has(1)&&idle.has(2));
  assert.equal(a.update(-1,0,16,true).frame,FRAMES_PER_DIRECTION);
 });
