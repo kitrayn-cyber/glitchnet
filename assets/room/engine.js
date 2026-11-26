@@ -1,6 +1,6 @@
 import {GAME_SIZE,roomFrame,decorationBounds} from './framing.js?v=room-size-10';
 import {drawRoom,drawWardrobe,drawDecoration} from './art.js?v=room-size-10';
-import {tintArtwork} from '../avatar/artwork.js';
+import {tintArtwork} from '../avatar/artwork.js?v=3';
 import {createWalkingAvatar} from './avatar.js?v=3';
 import {AvatarAnimation} from './animation.js?v=3';
 import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=room-size-10';
@@ -12,14 +12,14 @@ export function mountRoom(host,options) {
   const timer=setTimeout(()=>{if(!ready){game?.destroy(true);reject(new Error('Room renderer timed out'));}},10000);
   const on=(el,type,fn,opts)=>{el.addEventListener(type,fn,opts);cleanup.push(()=>el.removeEventListener(type,fn,opts));};
   class Room extends Phaser.Scene {
-   preload(){this.load.image('preview-walker','assets/avatar/art/walk-sheet.png');this.load.image('preview-blink','assets/avatar/art/walk-blink.png');}
+   preload(){this.load.image('preview-walker','assets/avatar/art/walk-sheet.png');this.load.image('preview-blink','assets/avatar/art/walk-blink.png');this.load.image('walk-hair-reference','assets/avatar/art/walk-hair-mask.png');}
    constructor(){super('GlitchNetRoom');this.held=new Set();this.target=null;this.mode='walk';this.selected=null;this.lastSaved='';}
    create(){
     try {
      drawRoom(this);
      drawWardrobe(this);
      if(this.textures.exists('preview-walker') && this.textures.exists('preview-blink')){
-      const open=tintArtwork(this.textures.get('preview-walker').getSourceImage(),options.state.avatar,'room'),closed=tintArtwork(this.textures.get('preview-blink').getSourceImage(),options.state.avatar,'room');
+      const original=this.textures.get('preview-walker').getSourceImage(),mask=this.textures.exists('walk-hair-reference')?this.textures.get('walk-hair-reference').getSourceImage():null,open=tintArtwork(original,options.state.avatar,'room',mask,original),closed=tintArtwork(this.textures.get('preview-blink').getSourceImage(),options.state.avatar,'room',mask,original);
       const frameW=24,frameH=32,tex=this.textures.createCanvas('walker',frameW*96,frameH),ctx=tex.context,rows=[0,1,3,2];ctx.imageSmoothingEnabled=false;
       for(let d=0;d<4;d++)for(let f=0;f<24;f++){const idle=f<4||f>=20,col=idle?0:Math.floor(((f-4)%8)/2),blink=(f>=2&&f<4)||f>=22,breath=idle&&(f%2===1),i=d*24+f,source=blink?closed:open;ctx.drawImage(source,col*150,rows[d]*164,150,164,i*frameW,breath?1:0,frameW,frameH-(breath?1:0));tex.add(i,0,i*frameW,0,frameW,frameH)}tex.refresh();
      }else createWalkingAvatar(this,options.state.avatar);
