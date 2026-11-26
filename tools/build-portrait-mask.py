@@ -75,3 +75,12 @@ for y in range(320):
    iris=0
   cm[x,y]=(hair,sk,iris,255)
 closed.save(p/'portrait-blink-color-mask.png',optimize=True)
+# The closed-eye source contains two saturated pink wedges over dark outer
+# eyeliner pixels. Preserve the open frame at those audited eye corners.
+guard=Image.new('RGBA',(320,320),(0,0,0,255)); guard_pixels=guard.load()
+for y in range(110,122):
+ for x in list(range(132,145))+list(range(225,235)):
+  r,gg,bl,alpha=c[x,y]; or_,og,ob,oa=a[x,y]
+  if alpha and or_<55 and og<40 and ob<55 and r>190 and r>gg*1.35 and bl>gg*1.15:
+   guard_pixels[x,y]=(255,0,0,255)
+guard.save(p/'portrait-blink-corner-guard.png',optimize=True)

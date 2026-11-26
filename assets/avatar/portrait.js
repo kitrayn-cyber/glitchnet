@@ -1,18 +1,19 @@
 import {tintArtwork,createHairMask} from './artwork.js?v=4';
 import {composeBlink} from './blink.js?v=4';
 const load=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Avatar artwork did not load'));image.src=new URL(src,import.meta.url).href;});
-const [open,closed,hair,selections,closedSelections]=await Promise.all([load('./art/portrait-open.png'),load('./art/portrait-blink.png'),load('./art/portrait-hair-mask.png'),load('./art/portrait-color-mask.png'),load('./art/portrait-blink-color-mask.png')]);
+const [open,closed,hair,selections,closedSelections,cornerGuardImage]=await Promise.all([load('./art/portrait-open.png'),load('./art/portrait-blink.png'),load('./art/portrait-hair-mask.png'),load('./art/portrait-color-mask.png'),load('./art/portrait-blink-color-mask.png'),load('./art/portrait-blink-corner-guard.png')]);
 const original=document.createElement('canvas');original.width=original.height=320;
 const originalCtx=original.getContext('2d',{willReadFrequently:true});originalCtx.imageSmoothingEnabled=false;originalCtx.drawImage(open,0,0,320,320);
 const originalPixels=originalCtx.getImageData(0,0,320,320).data;originalCtx.clearRect(0,0,320,320);originalCtx.drawImage(hair,0,0,320,320);const hairPixels=originalCtx.getImageData(0,0,320,320).data;
 const tintMask=createHairMask(open,hair,320,320,selections);
+originalCtx.clearRect(0,0,320,320);originalCtx.drawImage(cornerGuardImage,0,0,320,320);const guardPixels=originalCtx.getImageData(0,0,320,320).data,cornerGuard=new Uint8Array(320*320);for(let n=0;n<cornerGuard.length;n++)cornerGuard[n]=guardPixels[n*4]>127?1:0;
 const blinkCache=new Map();
 function blinkFrame(saved){
  const key=[saved?.hairColor,saved?.skin,saved?.eyes].join('|');if(blinkCache.has(key))return blinkCache.get(key);
  const base=tintArtwork(open,saved,'portrait',hair,open,selections),eyes=tintArtwork(closed,saved,'portrait',hair,open,closedSelections);
  const canvas=document.createElement('canvas');canvas.width=canvas.height=320;const ctx=canvas.getContext('2d',{willReadFrequently:true});
  const data=ctx.createImageData(320,320),baseData=base.getContext('2d').getImageData(0,0,320,320).data,eyesData=eyes.getContext('2d').getImageData(0,0,320,320).data;
- data.data.set(composeBlink(baseData,eyesData,originalPixels,hairPixels,320,320,tintMask));ctx.putImageData(data,0,0);
+ data.data.set(composeBlink(baseData,eyesData,originalPixels,hairPixels,320,320,tintMask,cornerGuard));ctx.putImageData(data,0,0);
  if(blinkCache.size>20)blinkCache.clear();blinkCache.set(key,canvas);return canvas;
 }
 export function drawPortrait(ctx,saved,pose={}){
