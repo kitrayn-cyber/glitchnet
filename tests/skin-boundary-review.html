@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>Skin boundary checks</title><p id="result">Running…</p><script type="module">
+import {drawPortrait} from '../assets/avatar/portrait.js?v=7';
+const samples=[[139,175],[174,191],[184,224],[232,231],[233,243],[57,244],[60,256]];
+let fail=0,total=0;const canvas=document.createElement('canvas');canvas.width=canvas.height=320;const ctx=canvas.getContext('2d',{willReadFrequently:true});
+function colors(s,blink){drawPortrait(ctx,s,{blink});const data=ctx.getImageData(0,0,320,320).data;return samples.map(([x,y])=>Array.from(data.slice((y*320+x)*4,(y*320+x)*4+4)).join(','))}
+for(let skin=0;skin<6;skin++)for(const blink of [false,true]){const base=colors({skin,hairColor:5,eyes:0},blink);for(let hairColor=0;hairColor<7;hairColor++){let actual=colors({skin,hairColor,eyes:0},blink);for(let j=0;j<samples.length;j++){if(actual[j]!==base[j])fail++;total++}}}
+document.querySelector('#result').textContent=`${total} skin-boundary comparisons; ${fail} differences across hair colors.`;
+</script>

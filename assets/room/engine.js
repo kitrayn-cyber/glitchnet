@@ -1,6 +1,7 @@
 import {GAME_SIZE,roomFrame,decorationBounds} from './framing.js?v=room-size-10';
 import {drawRoom,drawWardrobe,drawDecoration} from './art.js?v=room-size-10';
-import {tintArtwork} from '../avatar/artwork.js?v=3';
+import {tintArtwork} from '../avatar/artwork.js?v=4';
+import {composeRoomBlink} from '../avatar/room-blink.js?v=1';
 import {createWalkingAvatar} from './avatar.js?v=3';
 import {AvatarAnimation} from './animation.js?v=3';
 import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=room-size-10';
@@ -8,23 +9,30 @@ import {furniture,toWorld,toPercent,move,safeSpawn} from './geometry.js?v=room-s
 export function mountRoom(host,options) {
  return new Promise((resolve,reject)=>{
   let game,ready=false;
+  // Render at double resolution while retaining the existing world coordinates.
+  const renderScale=2;
   const cleanup=[];
   const timer=setTimeout(()=>{if(!ready){game?.destroy(true);reject(new Error('Room renderer timed out'));}},10000);
   const on=(el,type,fn,opts)=>{el.addEventListener(type,fn,opts);cleanup.push(()=>el.removeEventListener(type,fn,opts));};
   class Room extends Phaser.Scene {
-   preload(){this.load.image('preview-walker','assets/avatar/art/walk-sheet.png');this.load.image('preview-blink','assets/avatar/art/walk-blink.png');this.load.image('walk-hair-reference','assets/avatar/art/walk-hair-mask.png');}
+   preload(){this.load.image('preview-walker','assets/avatar/art/walk-sheet.png');this.load.image('preview-blink','assets/avatar/art/walk-blink.png');this.load.image('walk-hair-reference','assets/avatar/art/walk-hair-mask.png');this.load.image('walk-colors','assets/avatar/art/walk-color-mask.png');this.load.image('walk-blink-colors','assets/avatar/art/walk-blink-color-mask.png');}
    constructor(){super('GlitchNetRoom');this.held=new Set();this.target=null;this.mode='walk';this.selected=null;this.lastSaved='';}
    create(){
     try {
      drawRoom(this);
      drawWardrobe(this);
-     if(this.textures.exists('preview-walker') && this.textures.exists('preview-blink')){
-      const original=this.textures.get('preview-walker').getSourceImage(),mask=this.textures.exists('walk-hair-reference')?this.textures.get('walk-hair-reference').getSourceImage():null,open=tintArtwork(original,options.state.avatar,'room',mask,original),closed=tintArtwork(this.textures.get('preview-blink').getSourceImage(),options.state.avatar,'room',mask,original);
-      const frameW=24,frameH=32,tex=this.textures.createCanvas('walker',frameW*96,frameH),ctx=tex.context,rows=[0,1,3,2];ctx.imageSmoothingEnabled=false;
-      for(let d=0;d<4;d++)for(let f=0;f<24;f++){const idle=f<4||f>=20,col=idle?0:Math.floor(((f-4)%8)/2),blink=(f>=2&&f<4)||f>=22,breath=idle&&(f%2===1),i=d*24+f,source=blink?closed:open;ctx.drawImage(source,col*150,rows[d]*164,150,164,i*frameW,breath?1:0,frameW,frameH-(breath?1:0));tex.add(i,0,i*frameW,0,frameW,frameH)}tex.refresh();
+     const illustratedWalker=this.textures.exists('preview-walker') && this.textures.exists('preview-blink');
+     if(illustratedWalker){
+      const original=this.textures.get('preview-walker').getSourceImage(),mask=this.textures.exists('walk-hair-reference')?this.textures.get('walk-hair-reference').getSourceImage():null,selections=this.textures.get('walk-colors').getSourceImage(),closedSelections=this.textures.get('walk-blink-colors').getSourceImage(),open=tintArtwork(original,options.state.avatar,'room',mask,original,selections),closedArtwork=tintArtwork(this.textures.get('preview-blink').getSourceImage(),options.state.avatar,'room',mask,original,closedSelections);
+      const closed=composeRoomBlink(open,closedArtwork,original,mask,selections);
+      // Keep the original 150:164 proportions and enough source pixels for
+      // the larger render canvas. Arrange frames in rows to keep the atlas small.
+      const frameW=75,frameH=82,tex=this.textures.createCanvas('walker',frameW*24,frameH*4),ctx=tex.context,rows=[0,1,3,2];ctx.imageSmoothingEnabled=false;
+      for(let d=0;d<4;d++)for(let f=0;f<24;f++){const idle=f<4||f>=20,col=idle?0:Math.floor(((f-4)%8)/2),blink=(f>=2&&f<4)||f>=22,breath=idle&&(f%2===1),i=d*24+f,source=blink?closed:open,offset=breath?2:0;ctx.drawImage(source,col*150,rows[d]*164,150,164,f*frameW,d*frameH+offset,frameW,frameH-offset);tex.add(i,0,f*frameW,d*frameH,frameW,frameH)}tex.refresh();
      }else createWalkingAvatar(this,options.state.avatar);
      this.shadow=this.add.ellipse(0,0,18,5,0x9f85aa,.23).setDepth(5);
      this.player=this.add.sprite(0,0,'walker',0).setOrigin(.5,1).setDepth(10);
+     if(illustratedWalker)this.player.setDisplaySize(42*150/164,42);
      this.animation=new AvatarAnimation();this.decor=new Map();this.sync(options.state.positions,options.state.room.owned);
      for(const f of furniture)this.add.zone(f.x+f.w/2,f.y+f.h/2,f.w,f.h).setInteractive({useHandCursor:true}).on('pointerdown',pointer=>{
       if(this.mode==='decorate')return;
@@ -62,7 +70,7 @@ export function mountRoom(host,options) {
      });this.decor.set(id,g);
     }
     const view=roomFrame([...this.decor].map(([id,object])=>decorationBounds(id,object)));
-    this.cameras.main.setZoom(view.zoom).centerOn(view.left+view.width/2,view.top+view.height/2);
+    this.cameras.main.setZoom(view.zoom*renderScale).centerOn(view.left+view.width/2,view.top+view.height/2);
     host.dataset.viewLeft=String(view.left);host.dataset.viewTop=String(view.top);
     host.dataset.viewWidth=String(view.width);host.dataset.viewHeight=String(view.height);
     this.lastSaved=JSON.stringify(toPercent(this.player));this.refreshDOM();
@@ -93,7 +101,7 @@ export function mountRoom(host,options) {
    }
   }
   try{
-   game=new Phaser.Game({type:Phaser.CANVAS,parent:host,width:GAME_SIZE.width,height:GAME_SIZE.height,backgroundColor:'#343348',pixelArt:true,roundPixels:true,input:{keyboard:false},scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:Room});
+   game=new Phaser.Game({type:Phaser.CANVAS,parent:host,width:GAME_SIZE.width*renderScale,height:GAME_SIZE.height*renderScale,backgroundColor:'#343348',pixelArt:true,roundPixels:true,input:{keyboard:false},scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},scene:Room});
   }catch(error){clearTimeout(timer);game?.destroy(true);reject(error);}
  });
 }

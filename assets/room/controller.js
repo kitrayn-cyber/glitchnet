@@ -91,7 +91,7 @@ async function enablePhaser(){
  if(starting)return;starting=true;
  try{
   if(!window.Phaser)throw new Error('Phaser did not load');
-  const {mountRoom}=await import('./engine.js?v=hair-mask-1');
+  const {mountRoom}=await import('./engine.js?v=palette-fix-1');
   // Measure a visible host so Phaser maps pointer coordinates to the canvas correctly.
   scene.classList.add('phaser-active');host.hidden=false;
   engine=await mountRoom(host,{storage,state,action,position:savePosition,place,select,status:say,hint:text=>{if(mode==='walk')$('play-hint').textContent=text;}});
