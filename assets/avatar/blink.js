@@ -11,11 +11,11 @@ export function isHairPixel(original,hair,i){
  if(hair[i+3]<230)return false;
  return Math.abs(original[i]-hair[i])<35&&Math.abs(original[i+1]-hair[i+1])<35&&Math.abs(original[i+2]-hair[i+2])<35;
 }
-export function composeBlink(openPixels,closedPixels,originalPixels,hairPixels,width,height){
+export function composeBlink(openPixels,closedPixels,originalPixels,hairPixels,width,height,tintMask=null){
  const result=new Uint8ClampedArray(openPixels);
  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
   if(!isEyeRegion(x,y))continue;const i=(y*width+x)*4;
-  if(isHairPixel(originalPixels,hairPixels,i))continue;
+  if(tintMask?.[y*width+x]||isHairPixel(originalPixels,hairPixels,i))continue;
   result[i]=closedPixels[i];result[i+1]=closedPixels[i+1];result[i+2]=closedPixels[i+2];result[i+3]=closedPixels[i+3];
  }
  return result;
